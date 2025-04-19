@@ -1,0 +1,66 @@
+﻿@inherits LayoutComponentBase
+
+<MudRTLProvider RightToLeft="@_rightToLeft">
+
+	<MudThemeProvider @ref="_mudThemeProvider" Theme="_themeManager.Theme" @bind-IsDarkMode="_isDarkMode" DefaultScrollbar="true" />
+	<MudPopoverProvider />
+	<MudDialogProvider />
+	<MudSnackbarProvider />
+
+	<MudLayout>
+		<MudAppBar>
+			<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+			Noble Salah
+		</MudAppBar>
+		<MudDrawer @bind-Open="@_drawerOpen">
+			<NavMenu />
+		</MudDrawer>
+		<MudMainContent>
+			@Body
+		</MudMainContent>
+	</MudLayout>
+</MudRTLProvider>
+
+@code {
+	bool _drawerOpen = true;
+	bool _rightToLeft = false;
+	bool _isDarkMode = false;
+	string _themeIcon = Icons.Material.Filled.Brightness4;
+
+	DrawerVariant _drawerVariant = DrawerVariant.Responsive;
+	MudThemeProvider? _mudThemeProvider;
+	ThemeManagerTheme _themeManager = new ThemeManagerTheme();
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_isDarkMode = _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false;
+			StateHasChanged();
+		}
+	}
+
+	void DrawerToggle()
+	{
+		_drawerOpen = !_drawerOpen;
+	}
+
+	async Task SetTheme(AppTheme themeType)
+	{
+		switch (themeType)
+		{
+			case AppTheme.Light:
+				_isDarkMode = false;
+				_themeIcon = Icons.Material.Filled.Brightness7;
+				break;
+			case AppTheme.Dark:
+				_isDarkMode = true;
+				_themeIcon = Icons.Material.Filled.Brightness2;
+				break;
+			case AppTheme.System:
+				_isDarkMode = _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false;
+				_themeIcon = Icons.Material.Filled.Brightness4;
+				break;
+		}
+	}
+}

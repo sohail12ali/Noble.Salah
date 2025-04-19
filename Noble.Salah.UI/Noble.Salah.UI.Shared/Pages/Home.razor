@@ -1,0 +1,117 @@
+﻿@page "/"
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Interfaces
+@inject IFormFactor FormFactor
+@inject IPrayerService PrayerService
+@inject ILocationService LocationService
+
+<PageTitle>Noble Salah</PageTitle>
+
+<MudText Typo="Typo.h4">📿 Noble Salah</MudText>
+<MudText Typo="Typo.subtitle1" Class="mb-4">
+	Welcome on <em>@platform</em> | <em>@deviceOS</em> | <em>@deviceType</em>
+</MudText>
+
+<MudCard Class="mb-4">
+	<MudCardContent>
+		<MudText Typo="Typo.h6">Today's Prayer Times</MudText>
+		@if (latitude > 0 && longitude > 0)
+		{
+			<MudText Typo="Typo.body2">Location: @latitude, @longitude</MudText>
+		}
+		@if (prayerTimes is not null)
+		{
+			<MudScrollbar ScrollDirection="ScrollDirection.Horizontal" Class="mt-2"  BorderRadius="10">
+				<MudStack Row="true" Spacing="2">
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Fajr</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Fajr.ToShortTimeString()</MudText>
+					</MudPaper>
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Sunrise</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Sunrise.ToShortTimeString()</MudText>
+					</MudPaper>
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Dhuhr</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Dhuhr.ToShortTimeString()</MudText>
+					</MudPaper>
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Asr</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Asr.ToShortTimeString()</MudText>
+					</MudPaper>
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Maghrib</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Maghrib.ToShortTimeString()</MudText>
+					</MudPaper>
+					<MudPaper Class="pa-4 d-flex flex-column align-center justify-center" Elevation="3">
+						<MudText>Isha</MudText>
+						<MudText Typo="Typo.subtitle2">@prayerTimes.Isha.ToShortTimeString()</MudText>
+					</MudPaper>
+				</MudStack>
+			</MudScrollbar>
+
+			@if (nextPrayerTime is not null)
+			{
+				<MudText Typo="Typo.body1" Class="mt-2">
+					Next Prayer: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
+				</MudText>
+			}
+		}
+
+		<MudButton OnClick="DetectLocationAsync" Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3 me-2">
+			📍 Detect My Location
+		</MudButton>
+		<MudButton OnClick="LoadPrayerTimesAsync" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">
+			🔄 Refresh
+		</MudButton>
+
+	</MudCardContent>
+</MudCard>
+
+@code {
+	private string platform => FormFactor.GetPlatform();
+	private DeviceOS deviceOS => FormFactor.GetDeviceOS();
+	private HardwareType deviceType => FormFactor.GetHardwareType();
+
+	private string? timeZoneId;
+	private PrayerTimesModel? prayerTimes;
+	private PrayerName? nextPrayerName;
+	private DateTime? nextPrayerTime;
+	private double latitude;
+	private double longitude;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+		if (firstRender)
+		{
+			await DetectLocationAsync();
+		}
+	}
+
+
+	private async Task DetectLocationAsync()
+	{
+		timeZoneId = await LocationService.GetLocalTimeZoneIdAsync();
+		var result = await LocationService.GetCurrentLocationAsync();
+		if (result is not null)
+		{
+			latitude = result.Value.Latitude;
+			longitude = result.Value.Longitude;
+			PrayerService.UpdateConfigs(latitude, longitude, timeZoneId);
+
+			await LoadPrayerTimesAsync();
+		}
+	}
+
+	private Task LoadPrayerTimesAsync()
+	{
+		prayerTimes = PrayerService.GetTodayPrayerTimes();
+		var (name, time) = PrayerService.GetNextPrayer();
+		nextPrayerName = name;
+		nextPrayerTime = time;
+		StateHasChanged();
+		return Task.CompletedTask;
+	}
+}
