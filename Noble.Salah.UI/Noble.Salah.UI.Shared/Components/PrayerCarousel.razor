@@ -1,0 +1,109 @@
+﻿@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Enums
+@using MudBlazor
+
+@*
+  A standalone carousel component for displaying prayers.
+  Parameters:
+    - Prayers: List of PrayerModel items to display.
+    - NextPrayerName: The PrayerName enum indicating which slide should be active initially.
+    - Height: Optional CSS height for the carousel (default: "200px").
+*@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style type="text/css">
+
+    .bounceIn {
+        opacity: 0;
+        animation-delay: 0.5s;
+        animation-duration: 0.5s;
+        animation-name: bounceIn;
+        animation-fill-mode: forwards;
+    }
+
+    .bounceOut {
+        animation-duration: 0.5s;
+        animation-name: bounceOut;
+        animation-fill-mode: forwards;
+    }
+
+    .backInDown {
+        opacity: 0;
+        animation-delay: 0.5s;
+        animation-duration: 0.5s;
+        animation-name: backInDown;
+        animation-fill-mode: forwards;
+    }
+
+    .backOutDown {
+        animation-duration: 0.5s;
+        animation-name: backOutDown;
+        animation-fill-mode: forwards;
+    }
+
+    .rotateIn {
+        opacity: 0;
+        animation-delay: 0.5s;
+        animation-duration: 0.5s;
+        animation-name: rotateIn;
+        animation-fill-mode: forwards;
+    }
+
+    .rotateOut {
+        animation-duration: 0.5s;
+        animation-name: rotateOut;
+        animation-fill-mode: forwards;
+    }
+</style>
+
+<MudCarousel TData="PrayerModel"
+             Class="mud-width-full"
+             AutoCycle="false"
+             ShowArrows="true"
+             ShowDelimiters="true"
+             DelimiterIcon="@Icons.Material.Filled.Circle"
+             PreventTimerRestart="true"
+             Style="@($"height:{Height};")">
+    @foreach (var prayer in Prayers)
+    {
+        <MudCarouselItem Item="prayer">
+            <MudPaper Class="pa-0 d-flex flex-column align-center justify-center"
+                      Style="@($"position:relative; background-image:url('{prayer.BackgroundImageSource}'); background-size:cover; background-position:center; height:100%; width:100%;")">
+                <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
+                <div style="position:relative; color:white; text-align:center; padding:1rem;">
+                    <MudText Typo="Typo.h6">@prayer.PrayerName</MudText>
+                    <MudText Typo="Typo.subtitle2">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                </div>
+            </MudPaper>
+        </MudCarouselItem>
+    }
+</MudCarousel>
+
+@code {
+    /// <summary>
+    /// The list of prayers to display in the carousel.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public IList<PrayerModel> Prayers { get; set; } = new List<PrayerModel>();
+
+    /// <summary>
+    /// The next upcoming prayer; used to set the initial active slide.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public PrayerName NextPrayerName { get; set; }
+
+    /// <summary>
+    /// Height of the carousel (e.g. "200px").
+    /// </summary>
+    [Parameter]
+    public string Height { get; set; } = "500px";
+
+    private int activeSlideIndex = 0;
+
+    protected override void OnParametersSet()
+    {
+        // Determine which index matches the NextPrayerName
+        activeSlideIndex = Prayers
+            .Select((p, idx) => new { p.PrayerName, Index = idx })
+            .FirstOrDefault(x => x.PrayerName == NextPrayerName)?.Index ?? 0;
+    }
+}

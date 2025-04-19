@@ -3,22 +3,27 @@ using Batoulapps.Adhan;
 using Noble.Salah.Common.Interfaces;
 using Noble.Salah.Common.Models;
 using Noble.Salah.Common.Enums;
+using Noble.Salah.Common.Constants;
 
 namespace Noble.Salah.Integration.Services;
 
 public class PrayerService : IPrayerService
 {
     #region Fields
+
     private string _timeZoneId = string.Empty;
     private Coordinates _coordinates = new(0, 0);
 
     private CalculationMethod _method;
     private Madhab _madhab;
-    #endregion
+
+    #endregion Fields
 
     #region Task & Methods
 
-    public void UpdateConfigs(double latitude, double longitude, string timeZoneId, CalculationMethodBy method, SchoolOfThought madhab)
+    #region Configs
+
+    public void UpdateConfigs(double latitude, double longitude, string timeZoneId, CalculationMethodBy method = CalculationMethodBy.MUSLIM_WORLD_LEAGUE, SchoolOfThought madhab = SchoolOfThought.SHAFI)
     {
         _timeZoneId = timeZoneId;
 
@@ -60,6 +65,7 @@ public class PrayerService : IPrayerService
         };
     }
 
+    #endregion Configs
 
     public PrayerTimesModel GetPrayerTimes(DateTime date)
     {
@@ -70,12 +76,12 @@ public class PrayerService : IPrayerService
         var prayerTimes = new PrayerTimes(_coordinates, dateComponents, paramsConfig);
 
         return new PrayerTimesModel(
-            prayerTimes.Fajr,
-            prayerTimes.Sunrise,
-            prayerTimes.Dhuhr,
-            prayerTimes.Asr,
-            prayerTimes.Maghrib,
-            prayerTimes.Isha
+            prayerTimes.Fajr.ToLocalTime(),
+            prayerTimes.Sunrise.ToLocalTime(),
+            prayerTimes.Dhuhr.ToLocalTime(),
+            prayerTimes.Asr.ToLocalTime(),
+            prayerTimes.Maghrib.ToLocalTime(),
+            prayerTimes.Isha.ToLocalTime()
         );
     }
 
@@ -91,12 +97,12 @@ public class PrayerService : IPrayerService
 
         var prayerDict = new Dictionary<PrayerName, DateTime>
         {
-            [PrayerName.Fajr] = times.Fajr,
-            [PrayerName.Sunrise] = times.Sunrise,
-            [PrayerName.Dhuhr] = times.Dhuhr,
-            [PrayerName.Asr] = times.Asr,
-            [PrayerName.Maghrib] = times.Maghrib,
-            [PrayerName.Isha] = times.Isha
+            [PrayerName.Fajr] = times.Fajr.ToLocalTime(),
+            [PrayerName.Sunrise] = times.Sunrise.ToLocalTime(),
+            [PrayerName.Dhuhr] = times.Dhuhr.ToLocalTime(),
+            [PrayerName.Asr] = times.Asr.ToLocalTime(),
+            [PrayerName.Maghrib] = times.Maghrib.ToLocalTime(),
+            [PrayerName.Isha] = times.Isha.ToLocalTime()
         };
 
         foreach (var pair in prayerDict)
@@ -105,7 +111,27 @@ public class PrayerService : IPrayerService
                 return (pair.Key, pair.Value);
         }
         return (null, null);
-    } 
+    }
 
-    #endregion
+    public IList<PrayerModel> GetPrayers(DateTime date)
+    {
+        var prayerTimes = GetPrayerTimes(date);
+        var prayerList = new List<PrayerModel>
+        {
+            new(PrayerName.Fajr, prayerTimes.Fajr.ToLocalTime(), AppConstants.Images.Fajr),
+            new(PrayerName.Sunrise, prayerTimes.Sunrise.ToLocalTime(), AppConstants.Images.Sunrise),
+            new(PrayerName.Dhuhr, prayerTimes.Dhuhr.ToLocalTime(), AppConstants.Images.Dhuhr),
+            new(PrayerName.Asr, prayerTimes.Asr.ToLocalTime(), AppConstants.Images.Asr),
+            new(PrayerName.Maghrib, prayerTimes.Maghrib.ToLocalTime(), AppConstants.Images.Maghrib),
+            new(PrayerName.Isha, prayerTimes.Isha.ToLocalTime(), AppConstants.Images.Isha)
+        };
+        return prayerList;
+    }
+
+    public IList<PrayerModel> GetTodayPrayers()
+    {
+        return GetPrayers(DateTime.Now);
+    }
+
+    #endregion Task & Methods
 }
