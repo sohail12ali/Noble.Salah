@@ -11,6 +11,8 @@
 		<MudAppBar>
 			<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
 			Noble Salah
+			<MudSpacer />
+			<MudIconButton Icon="@_themeIcon" Color="Color.Inherit" Edge="Edge.End" OnClick="ToggleTheme" />
 		</MudAppBar>
 		<MudDrawer @bind-Open="@_drawerOpen">
 			<NavMenu />
@@ -30,6 +32,7 @@
 	DrawerVariant _drawerVariant = DrawerVariant.Responsive;
 	MudThemeProvider? _mudThemeProvider;
 	ThemeManagerTheme _themeManager = new ThemeManagerTheme();
+	AppTheme _currentTheme = AppTheme.System;
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -43,6 +46,19 @@
 	void DrawerToggle()
 	{
 		_drawerOpen = !_drawerOpen;
+	}
+
+	private async Task ToggleTheme()
+	{
+		_currentTheme = _currentTheme switch
+		{
+			AppTheme.Light => AppTheme.Dark,
+			AppTheme.Dark => AppTheme.System,
+			AppTheme.System => AppTheme.Light,
+			_ => AppTheme.System
+		};
+
+		await SetTheme(_currentTheme);
 	}
 
 	async Task SetTheme(AppTheme themeType)

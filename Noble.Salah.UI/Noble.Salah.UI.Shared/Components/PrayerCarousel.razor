@@ -70,8 +70,8 @@
                       Style="@($"position:relative; background-image:url('{prayer.BackgroundImageSource}'); background-size:cover; background-position:center; height:100%; width:100%;")">
                 <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
                 <div style="position:relative; color:white; text-align:center; padding:1rem;">
-                    <MudText Typo="Typo.h6">@prayer.PrayerName</MudText>
-                    <MudText Typo="Typo.subtitle2">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                    <MudText Typo="Typo.h1">@prayer.PrayerName</MudText>
+                    <MudText Typo="Typo.h2">@prayer.PrayerTime.ToShortTimeString()</MudText>
                 </div>
             </MudPaper>
         </MudCarouselItem>

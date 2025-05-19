@@ -11,4 +11,10 @@ public struct AppConstants
         public const string Maghrib = "_content/Noble.Salah.UI.Shared/Assets/Images/bgmaghrib.png";
         public const string Isha = "_content/Noble.Salah.UI.Shared/Assets/Images/bgisha.png";
     }
+
+
+    public struct Formats
+    {
+        public const string TimeSpanOnly = "hh:mm:ss";
+    }
 }

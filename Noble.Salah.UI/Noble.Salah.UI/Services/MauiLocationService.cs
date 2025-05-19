@@ -9,7 +9,7 @@ public class MauiLocationService : ILocationService
         var location = await Geolocation.GetLastKnownLocationAsync()
                        ?? await Geolocation.GetLocationAsync(new GeolocationRequest
                        {
-                           DesiredAccuracy = GeolocationAccuracy.Medium,
+                           DesiredAccuracy = GeolocationAccuracy.Lowest,
                            Timeout = TimeSpan.FromSeconds(10)
                        });
 

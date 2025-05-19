@@ -10,6 +10,7 @@ internal static class RegisterServices
         services
             .AddSingleton<IFormFactor, FormFactor>()
             .AddSingleton<IPrayerService, PrayerService>()
+            .AddSingleton<ILocalStorage, BrowserLocalStorage>()
             .AddSingleton<ILocationService, BrowserLocationService>();
 
         return services;
