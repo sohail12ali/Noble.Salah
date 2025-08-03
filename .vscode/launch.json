@@ -9,6 +9,95 @@
             "type": "maui",
             "request": "launch",
             "preLaunchTask": "maui: Build"
+        },
+        {
+            "name": "Noble.Salah.UI.Web (Blazor WASM)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Noble.Salah.UI.Web"
+            ],
+            "cwd": "${workspaceFolder}/Noble.Salah.UI.Web",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Noble.Salah.AppHost (.NET Aspire)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "dotnet",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/Noble.Salah.AppHost"
+            ],
+            "cwd": "${workspaceFolder}/Noble.Salah.AppHost",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "%s"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Noble.Salah.UI (MAUI Windows)",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build",
+            "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
+            "targetFramework": "net9.0-windows10.0.19041.0"
+        },
+        {
+            "name": "Noble.Salah.UI (MAUI Android)",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build",
+            "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
+            "targetFramework": "net9.0-android"
+        },
+        {
+            "name": "Noble.Salah.UI (MAUI iOS)",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build",
+            "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
+            "targetFramework": "net9.0-ios"
+        },
+        {
+            "name": "Noble.Salah.UI (MAUI macOS)",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "maui: Build",
+            "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
+            "targetFramework": "net9.0-maccatalyst"
+        },
+        {
+            "name": "Debug Current File",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${file}",
+            "args": [],
+            "cwd": "${fileDirname}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
         }
     ]
 }

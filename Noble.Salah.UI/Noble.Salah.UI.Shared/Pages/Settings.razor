@@ -1,0 +1,185 @@
+@page "/settings"
+@using Noble.Salah.Common.Constants
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Interfaces
+@inject IPrayerService PrayerService
+@inject ILocationService LocationService
+@inject ILocalStorage LocalStorage
+
+<PageTitle>Settings - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-4">
+    <MudText Typo="Typo.h4" Class="mb-4">⚙️ Settings</MudText>
+    
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Prayer Calculation Settings</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="CalculationMethodBy" 
+                               Label="Calculation Method" 
+                               @bind-Value="selectedCalculationMethod"
+                               Variant="Variant.Outlined">
+                        @foreach (var method in Enum.GetValues<CalculationMethodBy>())
+                        {
+                            <MudSelectItem Value="@method">@method.ToString().Replace("_", " ")</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudSelect T="SchoolOfThought" 
+                               Label="School of Thought" 
+                               @bind-Value="selectedSchoolOfThought"
+                               Variant="Variant.Outlined">
+                        @foreach (var school in Enum.GetValues<SchoolOfThought>())
+                        {
+                            <MudSelectItem Value="@school">@school.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Location Settings</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            @if (currentLocation.HasValue)
+            {
+                <MudText Typo="Typo.body1" Class="mb-2">
+                    Current Location: @currentLocation.Value.Latitude.ToString("F4"), @currentLocation.Value.Longitude.ToString("F4")
+                </MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">
+                    Timezone: @currentTimezone
+                </MudText>
+            }
+            <MudButton OnClick="UpdateLocationAsync" 
+                       Variant="Variant.Filled" 
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.LocationOn">
+                Update Location
+            </MudButton>
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">App Settings</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudSwitch T="bool" @bind-Checked="enableNotifications" 
+                       Label="Enable Prayer Notifications" 
+                       Color="Color.Primary" />
+            <MudSwitch T="bool" @bind-Checked="enableAdhanAudio" 
+                       Label="Enable Adhan Audio" 
+                       Color="Color.Primary" 
+                       Class="mt-3" />
+            <MudSwitch T="bool" @bind-Checked="enableDarkMode" 
+                       Label="Dark Mode" 
+                       Color="Color.Primary" 
+                       Class="mt-3" />
+        </MudCardContent>
+    </MudCard>
+
+    <MudButton OnClick="SaveSettingsAsync" 
+               Variant="Variant.Filled" 
+               Color="Color.Success"
+               StartIcon="@Icons.Material.Filled.Save"
+               Class="mt-4">
+        Save Settings
+    </MudButton>
+</MudContainer>
+
+@code {
+    private CalculationMethodBy selectedCalculationMethod = CalculationMethodBy.MUSLIM_WORLD_LEAGUE;
+    private SchoolOfThought selectedSchoolOfThought = SchoolOfThought.SHAFI;
+    private (double Latitude, double Longitude)? currentLocation;
+    private string currentTimezone = string.Empty;
+    private bool enableNotifications = true;
+    private bool enableAdhanAudio = true;
+    private bool enableDarkMode = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSettingsAsync();
+        await UpdateLocationAsync();
+    }
+
+    private async Task LoadSettingsAsync()
+    {
+        // Load saved settings from local storage
+        var savedMethod = await LocalStorage.LoadAsync<string>(AppConstants.Settings.CalculationMethod);
+        if (!string.IsNullOrEmpty(savedMethod) && Enum.TryParse<CalculationMethodBy>(savedMethod, out var method))
+        {
+            selectedCalculationMethod = method;
+        }
+
+        var savedSchool = await LocalStorage.LoadAsync<string>(AppConstants.Settings.SchoolOfThought);
+        if (!string.IsNullOrEmpty(savedSchool) && Enum.TryParse<SchoolOfThought>(savedSchool, out var school))
+        {
+            selectedSchoolOfThought = school;
+        }
+
+        var savedNotifications = await LocalStorage.LoadAsync<string>(AppConstants.Settings.EnableNotifications);
+        if (!string.IsNullOrEmpty(savedNotifications))
+        {
+            enableNotifications = bool.Parse(savedNotifications);
+        }
+
+        var savedAdhan = await LocalStorage.LoadAsync<string>(AppConstants.Settings.EnableAdhanAudio);
+        if (!string.IsNullOrEmpty(savedAdhan))
+        {
+            enableAdhanAudio = bool.Parse(savedAdhan);
+        }
+
+        var savedDarkMode = await LocalStorage.LoadAsync<string>(AppConstants.Settings.EnableDarkMode);
+        if (!string.IsNullOrEmpty(savedDarkMode))
+        {
+            enableDarkMode = bool.Parse(savedDarkMode);
+        }
+    }
+
+    private async Task UpdateLocationAsync()
+    {
+        currentLocation = await LocationService.GetCurrentLocationAsync();
+        currentTimezone = await LocationService.GetLocalTimeZoneIdAsync();
+        
+        if (currentLocation.HasValue)
+        {
+            PrayerService.UpdateConfigs(
+                currentLocation.Value.Latitude,
+                currentLocation.Value.Longitude,
+                currentTimezone,
+                selectedCalculationMethod,
+                selectedSchoolOfThought);
+        }
+    }
+
+    private async Task SaveSettingsAsync()
+    {
+        // Save settings to local storage
+        await LocalStorage.SaveAsync(AppConstants.Settings.CalculationMethod, selectedCalculationMethod.ToString());
+        await LocalStorage.SaveAsync(AppConstants.Settings.SchoolOfThought, selectedSchoolOfThought.ToString());
+        await LocalStorage.SaveAsync(AppConstants.Settings.EnableNotifications, enableNotifications.ToString());
+        await LocalStorage.SaveAsync(AppConstants.Settings.EnableAdhanAudio, enableAdhanAudio.ToString());
+        await LocalStorage.SaveAsync(AppConstants.Settings.EnableDarkMode, enableDarkMode.ToString());
+
+        // Update prayer service with new settings
+        if (currentLocation.HasValue)
+        {
+            PrayerService.UpdateConfigs(
+                currentLocation.Value.Latitude,
+                currentLocation.Value.Longitude,
+                currentTimezone,
+                selectedCalculationMethod,
+                selectedSchoolOfThought);
+        }
+
+        // Show success message
+        // Note: In a real implementation, you'd use a notification service
+    }
+} 

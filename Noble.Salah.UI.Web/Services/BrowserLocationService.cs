@@ -22,6 +22,20 @@ public class BrowserLocationService(IJSRuntime js) : ILocationService
 
     public async Task<string> GetLocalTimeZoneIdAsync()
     {
-        return await js.InvokeAsync<string>("getTimeZoneId");
+        try
+        {
+            var timeZoneId = await js.InvokeAsync<string>("getTimeZoneId");
+            if (string.IsNullOrEmpty(timeZoneId))
+            {
+                // Fallback to a default timezone if JavaScript returns empty
+                return "UTC";
+            }
+            return timeZoneId;
+        }
+        catch
+        {
+            // Fallback to UTC if JavaScript fails
+            return "UTC";
+        }
     }
 }

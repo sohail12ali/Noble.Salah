@@ -7,10 +7,25 @@
 @inject IFormFactor FormFactor
 @inject IPrayerService PrayerService
 @inject ILocationService LocationService
+@inject ILocalStorage LocalStorage
 
 <PageTitle>Noble Salah 📿</PageTitle>
-<MudCard Class="mb-4">
-	<MudCardContent Class="pa-4">
+
+@if (isLoading)
+{
+	<MudCard Class="mb-4">
+		<MudCardContent Class="pa-4">
+			<MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" Class="d-flex justify-center" />
+			<MudText Typo="Typo.body1" Align="Align.Center" Class="mt-3">
+				Loading prayer times...
+			</MudText>
+		</MudCardContent>
+	</MudCard>
+}
+else
+{
+	<MudCard Class="mb-4">
+		<MudCardContent Class="pa-4">
 		@if (latitude > 0 && longitude > 0)
 		{
 			<MudCard Class="mb-4">
@@ -25,12 +40,25 @@
 			<MudCard Class="mb-4">
 				<MudCardContent>
 					<PrayerCarousel Prayers="prayers"
-									NextPrayerName="nextPrayerName.Value" />
+									NextPrayerName="nextPrayerName.Value"
+									CurrentPrayerName="currentPrayerName"
+									ShowCurrentPrayerAsDefault="true" />
 				</MudCardContent>
 				<MudCardHeader>
 					<MudText Typo="Typo.body1" Class="mt-2">
+						@if (currentPrayerName.HasValue)
+						{
+							<span>Current Prayer: <strong>@currentPrayerName</strong></span>
+							<span class="mx-2">|</span>
+						}
 						Next Prayer: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
 					</MudText>
+					@if (remainingTime > TimeSpan.Zero)
+					{
+						<MudText Typo="Typo.h4" Color="Color.Primary" Class="mt-2">
+							⏰ @GetRemainingTime()
+						</MudText>
+					}
 				</MudCardHeader>
 			</MudCard>
 		}
@@ -43,13 +71,16 @@
 		</MudButton>
 	</MudCardContent>
 </MudCard>
+}
 
 @code {
-	private IList<PrayerModel> prayers;
+	private IList<PrayerModel>? prayers;
 	private PrayerName? nextPrayerName;
+	private PrayerName? currentPrayerName;
 	private DateTime? nextPrayerTime;
 	private double latitude;
 	private double longitude;
+	private bool isLoading = true;
 
 	private System.Timers.Timer? timer;
 	private TimeSpan remainingTime;
@@ -58,20 +89,115 @@
 	{
 		if (firstRender)
 		{
+			await LoadWithCachedLocationAsync();
+		}
+	}
+
+	private async Task LoadWithCachedLocationAsync()
+	{
+		isLoading = true;
+		StateHasChanged();
+
+		try
+		{
+			// Try to load cached location first
+			var cachedLat = await LocalStorage.LoadAsync<double?>(AppConstants.Location.Latitude);
+			var cachedLng = await LocalStorage.LoadAsync<double?>(AppConstants.Location.Longitude);
+			var cachedTz = await LocalStorage.LoadAsync<string>(AppConstants.Location.Timezone);
+			var lastUpdated = await LocalStorage.LoadAsync<DateTime?>(AppConstants.Location.LastUpdated);
+
+			// Check if cached location is recent (less than 1 hour old)
+			var isCachedLocationValid = cachedLat.HasValue && cachedLng.HasValue && 
+									   !string.IsNullOrEmpty(cachedTz) && 
+									   lastUpdated.HasValue && 
+									   DateTime.Now - lastUpdated.Value < TimeSpan.FromHours(1);
+
+			if (isCachedLocationValid)
+			{
+				// Use cached location for immediate display
+				latitude = cachedLat.Value;
+				longitude = cachedLng.Value;
+				PrayerService.UpdateConfigs(latitude, longitude, cachedTz ?? "UTC");
+				await LoadPrayerTimesAsync();
+				
+				// Update location in background
+				_ = Task.Run(async () => await UpdateLocationInBackgroundAsync());
+			}
+			else
+			{
+				// No valid cache, get fresh location
+				await DetectLocationAsync();
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error loading cached location: {ex.Message}");
+			// Fallback to fresh location detection
 			await DetectLocationAsync();
+		}
+		finally
+		{
+			isLoading = false;
+			StateHasChanged();
 		}
 	}
 
 	private async Task DetectLocationAsync()
 	{
-		var tz = await LocationService.GetLocalTimeZoneIdAsync();
-		var loc = await LocationService.GetCurrentLocationAsync();
-		if (loc is not null)
+		try
 		{
-			latitude = loc.Value.Latitude;
-			longitude = loc.Value.Longitude;
-			PrayerService.UpdateConfigs(latitude, longitude, tz);
-			await LoadPrayerTimesAsync();
+			var tz = await LocationService.GetLocalTimeZoneIdAsync();
+			var loc = await LocationService.GetCurrentLocationAsync();
+			if (loc is not null)
+			{
+				latitude = loc.Value.Latitude;
+				longitude = loc.Value.Longitude;
+				
+				// Cache the location data
+				await LocalStorage.SaveAsync(AppConstants.Location.Latitude, latitude);
+				await LocalStorage.SaveAsync(AppConstants.Location.Longitude, longitude);
+				await LocalStorage.SaveAsync(AppConstants.Location.Timezone, tz);
+				await LocalStorage.SaveAsync(AppConstants.Location.LastUpdated, DateTime.Now);
+				
+				PrayerService.UpdateConfigs(latitude, longitude, tz);
+				await LoadPrayerTimesAsync();
+			}
+		}
+		catch (Exception ex)
+		{
+			// Log error or show user-friendly message
+			Console.WriteLine($"Error detecting location: {ex.Message}");
+		}
+	}
+
+	private async Task UpdateLocationInBackgroundAsync()
+	{
+		try
+		{
+			var tz = await LocationService.GetLocalTimeZoneIdAsync();
+			var loc = await LocationService.GetCurrentLocationAsync();
+			if (loc is not null)
+			{
+				// Update cache with fresh location
+				await LocalStorage.SaveAsync(AppConstants.Location.Latitude, loc.Value.Latitude);
+				await LocalStorage.SaveAsync(AppConstants.Location.Longitude, loc.Value.Longitude);
+				await LocalStorage.SaveAsync(AppConstants.Location.Timezone, tz);
+				await LocalStorage.SaveAsync(AppConstants.Location.LastUpdated, DateTime.Now);
+				
+				// Update prayer service if location changed significantly
+				if (Math.Abs(latitude - loc.Value.Latitude) > 0.01 || Math.Abs(longitude - loc.Value.Longitude) > 0.01)
+				{
+					latitude = loc.Value.Latitude;
+					longitude = loc.Value.Longitude;
+					PrayerService.UpdateConfigs(latitude, longitude, tz);
+					await LoadPrayerTimesAsync();
+					await InvokeAsync(StateHasChanged);
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error updating location in background: {ex.Message}");
 		}
 	}
 
@@ -88,7 +214,46 @@
 
 		nextPrayerName = name;
 		nextPrayerTime = time;
+		
+		// Determine current prayer
+		currentPrayerName = DetermineCurrentPrayer();
+		
 		await StartCountdownTimer();
+	}
+
+	private PrayerName? DetermineCurrentPrayer()
+	{
+		if (prayers == null || prayers.Count == 0)
+			return null;
+
+		var now = DateTime.Now;
+		
+		// Find the current prayer (the one that started most recently but hasn't ended)
+		for (int i = 0; i < prayers.Count; i++)
+		{
+			var currentPrayer = prayers[i];
+			var nextPrayer = i < prayers.Count - 1 ? prayers[i + 1] : prayers[0]; // Wrap around to first prayer of next day
+			
+			// If it's the last prayer of the day, check if we're between this prayer and tomorrow's first prayer
+			if (i == prayers.Count - 1)
+			{
+				// For the last prayer, check if current time is after this prayer and before tomorrow's Fajr
+				if (now >= currentPrayer.PrayerTime)
+				{
+					return currentPrayer.PrayerName;
+				}
+			}
+			else
+			{
+				// Check if current time is between this prayer and the next prayer
+				if (now >= currentPrayer.PrayerTime && now < nextPrayer.PrayerTime)
+				{
+					return currentPrayer.PrayerName;
+				}
+			}
+		}
+		
+		return null;
 	}
 
 	private Task StartCountdownTimer()
@@ -98,10 +263,23 @@
 		timer.Elapsed += async (s, e) =>
 		{
 			UpdateRemainingTime();
+			UpdateCurrentPrayer();
 			await InvokeAsync(StateHasChanged);
 		};
 		timer.Start();
 		return Task.CompletedTask;
+	}
+
+	private void UpdateCurrentPrayer()
+	{
+		if (prayers != null)
+		{
+			var newCurrentPrayer = DetermineCurrentPrayer();
+			if (newCurrentPrayer != currentPrayerName)
+			{
+				currentPrayerName = newCurrentPrayer;
+			}
+		}
 	}
 
 	private void UpdateRemainingTime()
@@ -117,5 +295,15 @@
 		}
 	}
 
-	private string GetRemainingTime() => remainingTime.ToString(AppConstants.Formats.TimeSpanOnly);
+	private string GetRemainingTime()
+	{
+		try
+		{
+			return $"{remainingTime.Hours:D2}:{remainingTime.Minutes:D2}:{remainingTime.Seconds:D2}";
+		}
+		catch
+		{
+			return "00:00:00";
+		}
+	}
 }

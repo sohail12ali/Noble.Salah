@@ -62,16 +62,23 @@
              ShowDelimiters="true"
              DelimiterIcon="@Icons.Material.Filled.Circle"
              PreventTimerRestart="true"
+             @bind-SelectedIndex="activeSlideIndex"
              Style="@($"height:{Height};")">
     @foreach (var prayer in Prayers)
     {
-        <MudCarouselItem Item="prayer">
+        <MudCarouselItem>
             <MudPaper Class="pa-0 d-flex flex-column align-center justify-center"
-                      Style="@($"position:relative; background-image:url('{prayer.BackgroundImageSource}'); background-size:cover; background-position:center; height:100%; width:100%;")">
+                      Style="@GetPrayerCardStyle(prayer)">
                 <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
-                <div style="position:relative; color:white; text-align:center; padding:1rem;">
+                <div style="@GetPrayerTextStyle(prayer)">
                     <MudText Typo="Typo.h1">@prayer.PrayerName</MudText>
                     <MudText Typo="Typo.h2">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                    @if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
+                    {
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Class="mt-2">
+                            🕐 Current Prayer
+                        </MudChip>
+                    }
                 </div>
             </MudPaper>
         </MudCarouselItem>
@@ -92,18 +99,67 @@
     public PrayerName NextPrayerName { get; set; }
 
     /// <summary>
+    /// The current prayer (optional); used to highlight the current prayer.
+    /// </summary>
+    [Parameter]
+    public PrayerName? CurrentPrayerName { get; set; }
+
+    /// <summary>
+    /// Whether to show current prayer as default active slide (true) or next prayer (false).
+    /// </summary>
+    [Parameter]
+    public bool ShowCurrentPrayerAsDefault { get; set; } = true;
+
+    /// <summary>
     /// Height of the carousel (e.g. "200px").
     /// </summary>
     [Parameter]
     public string Height { get; set; } = "500px";
 
     private int activeSlideIndex = 0;
+    private bool isFirstRender = true;
 
     protected override void OnParametersSet()
     {
-        // Determine which index matches the NextPrayerName
-        activeSlideIndex = Prayers
-            .Select((p, idx) => new { p.PrayerName, Index = idx })
-            .FirstOrDefault(x => x.PrayerName == NextPrayerName)?.Index ?? 0;
+        if (isFirstRender && Prayers.Any())
+        {
+            // Only set the initial slide on first render
+            if (ShowCurrentPrayerAsDefault && CurrentPrayerName.HasValue)
+            {
+                activeSlideIndex = Prayers
+                    .Select((p, idx) => new { p.PrayerName, Index = idx })
+                    .FirstOrDefault(x => x.PrayerName == CurrentPrayerName.Value)?.Index ?? 0;
+            }
+            else
+            {
+                activeSlideIndex = Prayers
+                    .Select((p, idx) => new { p.PrayerName, Index = idx })
+                    .FirstOrDefault(x => x.PrayerName == NextPrayerName)?.Index ?? 0;
+            }
+            isFirstRender = false;
+        }
+    }
+
+    private string GetPrayerCardStyle(PrayerModel prayer)
+    {
+        var baseStyle = $"position:relative; background-image:url('{prayer.BackgroundImageSource}'); background-size:cover; background-position:center; height:100%; width:100%;";
+        
+        if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
+        {
+            // Add a special border or glow for current prayer
+            return baseStyle + " border: 3px solid #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);";
+        }
+        
+        return baseStyle;
+    }
+
+    private string GetPrayerTextStyle(PrayerModel prayer)
+    {
+        if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
+        {
+            return "position:relative; color:white; text-align:center; padding:1rem; background-color:rgba(76, 175, 80, 0.2); border-radius:8px;";
+        }
+        
+        return "position:relative; color:white; text-align:center; padding:1rem;";
     }
 }

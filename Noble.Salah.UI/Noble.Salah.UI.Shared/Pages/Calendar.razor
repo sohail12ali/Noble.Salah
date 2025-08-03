@@ -1,0 +1,155 @@
+@page "/calendar"
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Interfaces
+@inject IPrayerService PrayerService
+@inject ILocationService LocationService
+
+<PageTitle>Prayer Calendar - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+    <MudText Typo="Typo.h4" Class="mb-4">📅 Prayer Calendar</MudText>
+    
+    <MudCard Class="mb-4">
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudDatePicker Date="selectedDate" 
+                                   DateChanged="OnDateChanged"
+                                   Label="Select Date" 
+                                   Variant="Variant.Outlined" />
+                </MudItem>
+                <MudItem xs="12" sm="6">
+                    <MudButton OnClick="LoadTodayPrayers" 
+                               Variant="Variant.Filled" 
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.Today">
+                        Today
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+
+    @if (selectedPrayers is not null)
+    {
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">
+                    Prayer Times for @selectedDate.ToString("MMMM dd, yyyy")
+                </MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudGrid>
+                    @foreach (var prayer in selectedPrayers)
+                    {
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudCard Class="mb-3" Style="height: 200px;">
+                                <MudCardContent Class="pa-0 d-flex flex-column align-center justify-center"
+                                               Style="@($"position:relative; background-image:url('{prayer.BackgroundImageSource}'); background-size:cover; background-position:center; height:100%; width:100%;")">
+                                    <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.4);"></div>
+                                    <div style="position:relative; color:white; text-align:center; padding:1rem;">
+                                        <MudText Typo="Typo.h5" Class="mb-2">@prayer.PrayerName</MudText>
+                                        <MudText Typo="Typo.h4" Class="font-weight-bold">
+                                            @prayer.PrayerTime.ToString("HH:mm")
+                                        </MudText>
+                                        <MudText Typo="Typo.body2" Class="mt-2">
+                                            @prayer.PrayerTime.ToString("dddd, MMMM dd")
+                                        </MudText>
+                                    </div>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    }
+
+    @if (weeklyPrayers is not null)
+    {
+        <MudCard Class="mt-4">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">This Week's Prayer Times</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="weeklyPrayers" Dense="true" Hover="true" Striped="true">
+                    <HeaderContent>
+                        <MudTh>Date</MudTh>
+                        <MudTh>Fajr</MudTh>
+                        <MudTh>Sunrise</MudTh>
+                        <MudTh>Dhuhr</MudTh>
+                        <MudTh>Asr</MudTh>
+                        <MudTh>Maghrib</MudTh>
+                        <MudTh>Isha</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd>@context.Date.ToString("MMM dd")</MudTd>
+                        <MudTd>@context.PrayerTimes.Fajr.ToString("HH:mm")</MudTd>
+                        <MudTd>@context.PrayerTimes.Sunrise.ToString("HH:mm")</MudTd>
+                        <MudTd>@context.PrayerTimes.Dhuhr.ToString("HH:mm")</MudTd>
+                        <MudTd>@context.PrayerTimes.Asr.ToString("HH:mm")</MudTd>
+                        <MudTd>@context.PrayerTimes.Maghrib.ToString("HH:mm")</MudTd>
+                        <MudTd>@context.PrayerTimes.Isha.ToString("HH:mm")</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudContainer>
+
+@code {
+    private DateTime selectedDate = DateTime.Today;
+    private IList<PrayerModel>? selectedPrayers;
+    private List<WeeklyPrayerData>? weeklyPrayers;
+
+    private record WeeklyPrayerData(DateTime Date, PrayerTimesModel PrayerTimes);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTodayPrayers();
+        await LoadWeeklyPrayers();
+    }
+
+    private Task LoadTodayPrayers()
+    {
+        selectedDate = DateTime.Today;
+        selectedPrayers = PrayerService.GetPrayers(selectedDate);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task LoadWeeklyPrayers()
+    {
+        weeklyPrayers = new List<WeeklyPrayerData>();
+        var startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+        
+        for (int i = 0; i < 7; i++)
+        {
+            var date = startOfWeek.AddDays(i);
+            var prayerTimes = PrayerService.GetPrayerTimes(date);
+            weeklyPrayers.Add(new WeeklyPrayerData(date, prayerTimes));
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task OnDateChanged(DateTime? date)
+    {
+        if (date.HasValue)
+        {
+            selectedDate = date.Value;
+            selectedPrayers = PrayerService.GetPrayers(selectedDate);
+            StateHasChanged();
+        }
+        return Task.CompletedTask;
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (selectedPrayers is null || selectedPrayers.FirstOrDefault()?.PrayerTime.Date != selectedDate.Date)
+        {
+            selectedPrayers = PrayerService.GetPrayers(selectedDate);
+        }
+        return Task.CompletedTask;
+    }
+} 

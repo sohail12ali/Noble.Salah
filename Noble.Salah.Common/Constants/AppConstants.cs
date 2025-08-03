@@ -12,9 +12,25 @@ public struct AppConstants
         public const string Isha = "_content/Noble.Salah.UI.Shared/Assets/Images/bgisha.png";
     }
 
-
     public struct Formats
     {
-        public const string TimeSpanOnly = "hh:mm:ss";
+        public const string TimeSpanOnly = "c";
+    }
+
+    public struct Settings
+    {
+        public const string CalculationMethod = "calculationMethod";
+        public const string SchoolOfThought = "schoolOfThought";
+        public const string EnableNotifications = "enableNotifications";
+        public const string EnableAdhanAudio = "enableAdhanAudio";
+        public const string EnableDarkMode = "enableDarkMode";
+    }
+
+    public struct Location
+    {
+        public const string Latitude = "cachedLatitude";
+        public const string Longitude = "cachedLongitude";
+        public const string Timezone = "cachedTimezone";
+        public const string LastUpdated = "locationLastUpdated";
     }
 }

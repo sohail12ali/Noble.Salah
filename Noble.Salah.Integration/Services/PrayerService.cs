@@ -93,7 +93,25 @@ public class PrayerService : IPrayerService
     public (PrayerName?, DateTime?) GetNextPrayer()
     {
         var times = GetTodayPrayerTimes();
-        var now = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById(_timeZoneId));
+        
+        DateTime now;
+        try
+        {
+            if (string.IsNullOrEmpty(_timeZoneId))
+            {
+                now = DateTime.Now;
+            }
+            else
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById(_timeZoneId);
+                now = TimeZoneInfo.ConvertTime(DateTime.Now, timeZone);
+            }
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            // Fallback to local time if timezone is not found
+            now = DateTime.Now;
+        }
 
         var prayerDict = new Dictionary<PrayerName, DateTime>
         {

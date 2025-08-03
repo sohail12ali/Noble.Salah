@@ -55,7 +55,15 @@
     </script>
     <script>
         // Get the current time zone ID
-        window.getTimeZoneId = () => Intl.DateTimeFormat().resolvedOptions().timeZone;
+        window.getTimeZoneId = () => {
+            try {
+                const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                return timeZone || "UTC";
+            } catch (error) {
+                console.warn("Failed to get timezone, using UTC as fallback:", error);
+                return "UTC";
+            }
+        };
     </script>
 </body>
 
