@@ -2,6 +2,7 @@
 @using Noble.Salah.Common.Constants
 @using Noble.Salah.Common.Enums
 @using Noble.Salah.Common.Interfaces
+@using Noble.Salah.Common.Services
 @inject IPrayerService PrayerService
 @inject ILocationService LocationService
 @inject ILocalStorage LocalStorage
@@ -66,9 +67,11 @@
         </MudCardContent>
     </MudCard>
 
+
+
     <MudCard Class="mb-4">
         <MudCardHeader>
-            <MudText Typo="Typo.h6">App Settings</MudText>
+            <MudText Typo="Typo.h6">Notification Settings</MudText>
         </MudCardHeader>
         <MudCardContent>
             <MudSwitch T="bool" @bind-Checked="enableNotifications" 
@@ -76,10 +79,6 @@
                        Color="Color.Primary" />
             <MudSwitch T="bool" @bind-Checked="enableAdhanAudio" 
                        Label="Enable Adhan Audio" 
-                       Color="Color.Primary" 
-                       Class="mt-3" />
-            <MudSwitch T="bool" @bind-Checked="enableDarkMode" 
-                       Label="Dark Mode" 
                        Color="Color.Primary" 
                        Class="mt-3" />
         </MudCardContent>
@@ -101,7 +100,6 @@
     private string currentTimezone = string.Empty;
     private bool enableNotifications = true;
     private bool enableAdhanAudio = true;
-    private bool enableDarkMode = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -136,50 +134,108 @@
             enableAdhanAudio = bool.Parse(savedAdhan);
         }
 
-        var savedDarkMode = await LocalStorage.LoadAsync<string>(AppConstants.Settings.EnableDarkMode);
-        if (!string.IsNullOrEmpty(savedDarkMode))
-        {
-            enableDarkMode = bool.Parse(savedDarkMode);
-        }
+
     }
 
     private async Task UpdateLocationAsync()
     {
-        currentLocation = await LocationService.GetCurrentLocationAsync();
-        currentTimezone = await LocationService.GetLocalTimeZoneIdAsync();
-        
-        if (currentLocation.HasValue)
+        try
         {
-            PrayerService.UpdateConfigs(
-                currentLocation.Value.Latitude,
-                currentLocation.Value.Longitude,
-                currentTimezone,
-                selectedCalculationMethod,
-                selectedSchoolOfThought);
+            currentLocation = await LocationService.GetCurrentLocationAsync();
+            currentTimezone = await LocationService.GetLocalTimeZoneIdAsync();
+            
+            // Validate location data
+            if (currentLocation.HasValue)
+            {
+                if (!ValidationService.IsValidLatitude(currentLocation.Value.Latitude))
+                {
+                    // Handle invalid latitude
+                    currentLocation = null;
+                    return;
+                }
+                
+                if (!ValidationService.IsValidLongitude(currentLocation.Value.Longitude))
+                {
+                    // Handle invalid longitude
+                    currentLocation = null;
+                    return;
+                }
+            }
+            
+            // Validate timezone
+            if (!ValidationService.IsValidTimezone(currentTimezone))
+            {
+                // Handle invalid timezone
+                currentTimezone = string.Empty;
+                return;
+            }
+            
+            if (currentLocation.HasValue)
+            {
+                PrayerService.UpdateConfigs(
+                    currentLocation.Value.Latitude,
+                    currentLocation.Value.Longitude,
+                    currentTimezone,
+                    selectedCalculationMethod,
+                    selectedSchoolOfThought);
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error and handle gracefully
+            Console.WriteLine($"Error updating location: {ex.Message}");
+            currentLocation = null;
+            currentTimezone = string.Empty;
         }
     }
 
     private async Task SaveSettingsAsync()
     {
-        // Save settings to local storage
-        await LocalStorage.SaveAsync(AppConstants.Settings.CalculationMethod, selectedCalculationMethod.ToString());
-        await LocalStorage.SaveAsync(AppConstants.Settings.SchoolOfThought, selectedSchoolOfThought.ToString());
-        await LocalStorage.SaveAsync(AppConstants.Settings.EnableNotifications, enableNotifications.ToString());
-        await LocalStorage.SaveAsync(AppConstants.Settings.EnableAdhanAudio, enableAdhanAudio.ToString());
-        await LocalStorage.SaveAsync(AppConstants.Settings.EnableDarkMode, enableDarkMode.ToString());
-
-        // Update prayer service with new settings
-        if (currentLocation.HasValue)
+        try
         {
-            PrayerService.UpdateConfigs(
-                currentLocation.Value.Latitude,
-                currentLocation.Value.Longitude,
-                currentTimezone,
-                selectedCalculationMethod,
-                selectedSchoolOfThought);
-        }
+            // Validate settings before saving
+            if (!ValidationService.IsValidString(currentTimezone))
+            {
+                // Handle invalid timezone
+                return;
+            }
+            
+            if (currentLocation.HasValue)
+            {
+                if (!ValidationService.IsValidLatitude(currentLocation.Value.Latitude) ||
+                    !ValidationService.IsValidLongitude(currentLocation.Value.Longitude))
+                {
+                    // Handle invalid coordinates
+                    return;
+                }
+            }
+            
+            // Save settings to local storage
+            await LocalStorage.SaveAsync(AppConstants.Settings.CalculationMethod, selectedCalculationMethod.ToString());
+            await LocalStorage.SaveAsync(AppConstants.Settings.SchoolOfThought, selectedSchoolOfThought.ToString());
+            await LocalStorage.SaveAsync(AppConstants.Settings.EnableNotifications, enableNotifications.ToString());
+            await LocalStorage.SaveAsync(AppConstants.Settings.EnableAdhanAudio, enableAdhanAudio.ToString());
 
-        // Show success message
-        // Note: In a real implementation, you'd use a notification service
+            // Update prayer service with new settings
+            if (currentLocation.HasValue)
+            {
+                PrayerService.UpdateConfigs(
+                    currentLocation.Value.Latitude,
+                    currentLocation.Value.Longitude,
+                    currentTimezone,
+                    selectedCalculationMethod,
+                    selectedSchoolOfThought);
+            }
+
+            // Show success message
+            // Note: In a real implementation, you'd use a notification service
+        }
+        catch (Exception ex)
+        {
+            // Log error and handle gracefully
+            Console.WriteLine($"Error saving settings: {ex.Message}");
+        }
     }
+
+
 } 

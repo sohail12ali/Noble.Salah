@@ -26,15 +26,6 @@ else
 {
 	<MudCard Class="mb-4">
 		<MudCardContent Class="pa-4">
-		@if (latitude > 0 && longitude > 0)
-		{
-			<MudCard Class="mb-4">
-				<MudCardContent>
-					<MudText Typo="Typo.body2" Align="Align.Center">Location: @latitude, @longitude</MudText>
-				</MudCardContent>
-			</MudCard>
-		}
-
 		@if (prayers is not null && nextPrayerName is not null)
 		{
 			<MudCard Class="mb-4">
@@ -62,13 +53,6 @@ else
 				</MudCardHeader>
 			</MudCard>
 		}
-
-		<MudButton OnClick="DetectLocationAsync" Variant="Variant.Filled" Color="Color.Secondary" Class="mt-3 me-2">
-			📍 Detect My Location
-		</MudButton>
-		<MudButton OnClick="LoadPrayerTimesAsync" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">
-			🔄 Refresh
-		</MudButton>
 	</MudCardContent>
 </MudCard>
 }

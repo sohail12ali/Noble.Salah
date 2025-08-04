@@ -1,4 +1,5 @@
 ﻿using Noble.Salah.Common.Interfaces;
+using Noble.Salah.Common.Models;
 using Noble.Salah.Integration.Services;
 
 namespace Noble.Salah.UI.Web.Services;
@@ -11,7 +12,8 @@ internal static class RegisterServices
             .AddSingleton<IFormFactor, FormFactor>()
             .AddSingleton<IPrayerService, PrayerService>()
             .AddSingleton<ILocalStorage, BrowserLocalStorage>()
-            .AddSingleton<ILocationService, BrowserLocationService>();
+            .AddSingleton<ILocationService, BrowserLocationService>()
+            .AddSingleton<ThemeManager>();
 
         return services;
     }

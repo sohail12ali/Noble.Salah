@@ -5,16 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET MAUI",
-            "type": "maui",
-            "request": "launch",
-            "preLaunchTask": "maui: Build"
-        },
-        {
             "name": "Noble.Salah.UI.Web (Blazor WASM)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-web",
             "program": "dotnet",
             "args": [
                 "run",
@@ -31,6 +25,10 @@
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "justMyCode": true,
+            "detail": "Debugs the Blazor WebAssembly UI project with proper dependencies.",
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
             }
@@ -39,7 +37,7 @@
             "name": "Noble.Salah.AppHost (.NET Aspire)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-apphost",
             "program": "dotnet",
             "args": [
                 "run",
@@ -55,39 +53,75 @@
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
-            }
+            },
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "justMyCode": true,
+            "detail": "Debugs the .NET Aspire AppHost project."
+        },
+        {
+            "name": ".NET MAUI (All Platforms)",
+            "type": "maui",
+            "request": "launch",
+            "preLaunchTask": "build-maui",
+            "justMyCode": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "detail": "Debugs the MAUI app for all platforms."
         },
         {
             "name": "Noble.Salah.UI (MAUI Windows)",
             "type": "maui",
             "request": "launch",
-            "preLaunchTask": "maui: Build",
+            "preLaunchTask": "build-maui",
             "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
-            "targetFramework": "net9.0-windows10.0.19041.0"
+            "targetFramework": "net9.0-windows10.0.19041.0",
+            "justMyCode": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "detail": "Debugs the MAUI Windows app."
         },
         {
             "name": "Noble.Salah.UI (MAUI Android)",
             "type": "maui",
             "request": "launch",
-            "preLaunchTask": "maui: Build",
+            "preLaunchTask": "build-maui",
             "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
-            "targetFramework": "net9.0-android"
+            "targetFramework": "net9.0-android",
+            "justMyCode": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "detail": "Debugs the MAUI Android app."
         },
         {
             "name": "Noble.Salah.UI (MAUI iOS)",
             "type": "maui",
             "request": "launch",
-            "preLaunchTask": "maui: Build",
+            "preLaunchTask": "build-maui",
             "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
-            "targetFramework": "net9.0-ios"
+            "targetFramework": "net9.0-ios",
+            "justMyCode": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "detail": "Debugs the MAUI iOS app."
         },
         {
             "name": "Noble.Salah.UI (MAUI macOS)",
             "type": "maui",
             "request": "launch",
-            "preLaunchTask": "maui: Build",
+            "preLaunchTask": "build-maui",
             "projectPath": "${workspaceFolder}/Noble.Salah.UI/Noble.Salah.UI/Noble.Salah.UI.csproj",
-            "targetFramework": "net9.0-maccatalyst"
+            "targetFramework": "net9.0-maccatalyst",
+            "justMyCode": true,
+            "internalConsoleOptions": "openOnSessionStart",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "integratedTerminal",
+            "detail": "Debugs the MAUI macOS app."
         },
         {
             "name": "Debug Current File",
@@ -97,7 +131,39 @@
             "args": [],
             "cwd": "${fileDirname}",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "justMyCode": true,
+            "envFile": "${workspaceFolder}/.env",
+            "detail": "Debugs the currently open file."
+        },
+        {
+            "name": "Attach to Process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": true,
+            "detail": "Attaches to a running .NET process for debugging."
+        },
+        {
+            "name": "Debug Integration Tests",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-integration",
+            "program": "dotnet",
+            "args": [
+                "test",
+                "${workspaceFolder}/Noble.Salah.Integration/Noble.Salah.Integration.csproj",
+                "--logger",
+                "console;verbosity=detailed"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart",
+            "justMyCode": true,
+            "envFile": "${workspaceFolder}/.env",
+            "detail": "Debugs integration tests in the Integration project."
         }
     ]
 }

@@ -94,3 +94,6 @@ This rule provides guidelines for developing with .NET MAUI Blazor in the Noble.
 6. **Use Adhan Library**: Utilize the Adhan library for accurate prayer time calculations
 7. **Implement PWA Features**: Enable Progressive Web App capabilities for web deployment
 8. **Follow .NET Aspire Patterns**: Use the AppHost and ServiceDefaults projects for cloud-native deployment
+
+# Noble Salah Website
+Our Web Site is deployed on **https://huggingface.co/spaces/Sohail-Ali/noblesalah**

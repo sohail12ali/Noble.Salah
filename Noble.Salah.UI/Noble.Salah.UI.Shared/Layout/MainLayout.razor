@@ -1,8 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Interfaces
+@inject ILocalStorage LocalStorage
+@inject ThemeManager ThemeManager
 
 <MudRTLProvider RightToLeft="@_rightToLeft">
 
-	<MudThemeProvider @ref="_mudThemeProvider" Theme="_themeManager.Theme" @bind-IsDarkMode="_isDarkMode" DefaultScrollbar="true" />
+	<MudThemeProvider @ref="_mudThemeProvider" Theme="@_currentMudTheme" @bind-IsDarkMode="_isDarkMode" DefaultScrollbar="true" />
 	<MudPopoverProvider />
 	<MudDialogProvider />
 	<MudSnackbarProvider />
@@ -14,9 +18,9 @@
 			<MudSpacer />
 			<MudIconButton Icon="@_themeIcon" Color="Color.Inherit" Edge="Edge.End" OnClick="ToggleTheme" />
 		</MudAppBar>
-		<MudDrawer @bind-Open="@_drawerOpen">
-			<NavMenu />
-		</MudDrawer>
+			<MudDrawer @bind-Open="@_drawerOpen" Variant="DrawerVariant.Responsive">
+		<NavMenu />
+	</MudDrawer>
 		<MudMainContent>
 			@Body
 		</MudMainContent>
@@ -28,11 +32,30 @@
 	bool _rightToLeft = false;
 	bool _isDarkMode = false;
 	string _themeIcon = Icons.Material.Filled.Brightness4;
-
-	DrawerVariant _drawerVariant = DrawerVariant.Responsive;
 	MudThemeProvider? _mudThemeProvider;
-	ThemeManagerTheme _themeManager = new ThemeManagerTheme();
 	AppTheme _currentTheme = AppTheme.System;
+	MudTheme _currentMudTheme = new MudTheme();
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			if (ThemeManager != null)
+			{
+				await ThemeManager.LoadThemeAsync(LocalStorage);
+				_currentTheme = ThemeManager.CurrentTheme;
+				ThemeManager.ThemeChanged += StateHasChanged;
+				await UpdateThemeAsync();
+			}
+		}
+		catch (Exception ex)
+		{
+			// Log error and continue with default theme
+			Console.WriteLine($"Error initializing theme: {ex.Message}");
+			_currentTheme = AppTheme.System;
+			_currentMudTheme = new MudTheme();
+		}
+	}
 
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
@@ -50,32 +73,54 @@
 
 	private async Task ToggleTheme()
 	{
-		_currentTheme = _currentTheme switch
+		try
 		{
-			AppTheme.Light => AppTheme.Dark,
-			AppTheme.Dark => AppTheme.System,
-			AppTheme.System => AppTheme.Light,
-			_ => AppTheme.System
-		};
-
-		await SetTheme(_currentTheme);
+			var newTheme = _currentTheme switch
+			{
+				AppTheme.Light => AppTheme.Dark,
+				AppTheme.Dark => AppTheme.Ramadan,
+				AppTheme.Ramadan => AppTheme.System,
+				AppTheme.System => AppTheme.Light,
+				_ => AppTheme.System
+			};
+			
+			if (ThemeManager != null)
+			{
+				await ThemeManager.SetThemeAsync(newTheme, LocalStorage);
+			}
+			_currentTheme = newTheme;
+			await UpdateThemeAsync();
+		}
+		catch (Exception ex)
+		{
+			// Log error and continue
+			Console.WriteLine($"Error toggling theme: {ex.Message}");
+		}
 	}
 
-	async Task SetTheme(AppTheme themeType)
+	private async Task UpdateThemeAsync()
 	{
-		switch (themeType)
+		switch (_currentTheme)
 		{
 			case AppTheme.Light:
 				_isDarkMode = false;
 				_themeIcon = Icons.Material.Filled.Brightness7;
+				_currentMudTheme = new MudTheme();
 				break;
 			case AppTheme.Dark:
 				_isDarkMode = true;
 				_themeIcon = Icons.Material.Filled.Brightness2;
+				_currentMudTheme = new MudTheme();
+				break;
+			case AppTheme.Ramadan:
+				_isDarkMode = true;
+				_themeIcon = Icons.Material.Filled.Celebration;
+				_currentMudTheme = RamadanTheme.GetRamadanTheme();
 				break;
 			case AppTheme.System:
 				_isDarkMode = _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false;
 				_themeIcon = Icons.Material.Filled.Brightness4;
+				_currentMudTheme = new MudTheme();
 				break;
 		}
 	}

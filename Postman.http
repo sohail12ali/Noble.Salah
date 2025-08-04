@@ -1,0 +1,24 @@
+
+## Ollama 3.2 Chat Request
+POST http://192.168.1.126:11434/api/chat
+Content-Type: application/json
+
+{
+  "model": "deepseek-r1",
+  "messages": [
+    {
+      "role": "user",
+      "content": "why is the sky blue?"
+    }
+  ]
+}
+
+### LM Studio Chat Request
+POST http://localhost:1234/v1/chat/completions
+Content-Type: application/json
+{
+  -     "model": "gpt-4o-mini",
+  +     "model": "use the model identifier from LM Studio here",
+  "messages": [{"role": "user", "content": "Say this is a test!"}],
+  "temperature": 0.7
+}
