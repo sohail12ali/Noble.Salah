@@ -9,7 +9,7 @@
 
 <PageTitle>Settings - Noble Salah</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-4">
+<MudContainer MaxWidth="MaxWidth.Medium" Class="pa-2 pa-md-4">
     <MudText Typo="Typo.h4" Class="mb-4">⚙️ Settings</MudText>
     
     <MudCard Class="mb-4">
@@ -22,7 +22,8 @@
                     <MudSelect T="CalculationMethodBy" 
                                Label="Calculation Method" 
                                @bind-Value="selectedCalculationMethod"
-                               Variant="Variant.Outlined">
+                               Variant="Variant.Outlined"
+                               Class="mb-3">
                         @foreach (var method in Enum.GetValues<CalculationMethodBy>())
                         {
                             <MudSelectItem Value="@method">@method.ToString().Replace("_", " ")</MudSelectItem>
@@ -33,7 +34,8 @@
                     <MudSelect T="SchoolOfThought" 
                                Label="School of Thought" 
                                @bind-Value="selectedSchoolOfThought"
-                               Variant="Variant.Outlined">
+                               Variant="Variant.Outlined"
+                               Class="mb-3">
                         @foreach (var school in Enum.GetValues<SchoolOfThought>())
                         {
                             <MudSelectItem Value="@school">@school.ToString()</MudSelectItem>

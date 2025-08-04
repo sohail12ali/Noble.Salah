@@ -63,7 +63,7 @@
              Delimiter-Icon="@Icons.Material.Filled.Circle"
              Prevent-Timer-Restart="true"
              @bind-SelectedIndex="activeSlideIndex"
-             Style="@($"height:{Height};")">
+             Style="@($"height:{GetResponsiveHeight()};")">
     @foreach (var prayer in Prayers)
     {
         <MudCarouselItem>
@@ -71,8 +71,8 @@
                       Style="@GetPrayerCardStyle(prayer)">
                 <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
                 <div style="@GetPrayerTextStyle(prayer)">
-                    <MudText Typo="Typo.h1">@prayer.PrayerName</MudText>
-                    <MudText Typo="Typo.h2">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                    <MudText Typo="@GetResponsiveTypo()">@prayer.PrayerName</MudText>
+                    <MudText Typo="@GetResponsiveTimeTypo()">@prayer.PrayerTime.ToShortTimeString()</MudText>
                     @if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
                     {
                         <MudChip T="string" Color="Color.Success" Size="Size.Small" Class="mt-2">
@@ -161,5 +161,23 @@
         }
         
         return "position:relative; color:white; text-align:center; padding:1rem;";
+    }
+
+    private string GetResponsiveHeight()
+    {
+        // Use JavaScript to detect screen width and return appropriate height
+        return "min-height: 300px; max-height: 500px; height: 60vh;";
+    }
+
+    private Typo GetResponsiveTypo()
+    {
+        // Return smaller typography for mobile screens
+        return Typo.h3; // Default to h3, can be made more responsive if needed
+    }
+
+    private Typo GetResponsiveTimeTypo()
+    {
+        // Return smaller typography for mobile screens
+        return Typo.h4; // Default to h4, can be made more responsive if needed
     }
 }

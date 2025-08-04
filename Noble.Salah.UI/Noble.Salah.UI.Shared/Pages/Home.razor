@@ -25,28 +25,28 @@
 else
 {
 	<MudCard Class="mb-4">
-		<MudCardContent Class="pa-4">
+		<MudCardContent Class="pa-2 pa-md-4">
 		@if (prayers is not null && nextPrayerName is not null)
 		{
 			<MudCard Class="mb-4">
-				<MudCardContent>
+				<MudCardContent Class="pa-0">
 					<PrayerCarousel Prayers="prayers"
 									NextPrayerName="nextPrayerName.Value"
 									CurrentPrayerName="currentPrayerName"
 									ShowCurrentPrayerAsDefault="true" />
 				</MudCardContent>
-				<MudCardHeader>
-					<MudText Typo="Typo.body1" Class="mt-2">
+				<MudCardHeader Class="pa-3">
+					<MudText Typo="Typo.body2" Class="mt-2 text-center">
 						@if (currentPrayerName.HasValue)
 						{
-							<span>Current Prayer: <strong>@currentPrayerName</strong></span>
+							<span>Current: <strong>@currentPrayerName</strong></span>
 							<span class="mx-2">|</span>
 						}
-						Next Prayer: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
+						Next: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
 					</MudText>
 					@if (remainingTime > TimeSpan.Zero)
 					{
-						<MudText Typo="Typo.h4" Color="Color.Primary" Class="mt-2">
+						<MudText Typo="Typo.h5" Color="Color.Primary" Class="mt-2 text-center">
 							⏰ @GetRemainingTime()
 						</MudText>
 					}
