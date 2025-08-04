@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noble Salah - Islamic Prayer App by Noble Wave Organization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .ramadan-theme {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        }
+        .scroll-container::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <i class="fas fa-mosque text-3xl mr-3"></i>
+                    <h1 class="text-2xl md:text-3xl font-bold">Noble Salah</h1>
+                </div>
+                <nav class="flex space-x-1 md:space-x-4">
+                    <a href="#features" class="px-3 py-2 rounded hover:bg-white hover:bg-opacity-20 transition">Features</a>
+                    <a href="#overview" class="px-3 py-2 rounded hover:bg-white hover:bg-opacity-20 transition">Overview</a>
+                    <a href="#tech" class="px-3 py-2 rounded hover:bg-white hover:bg-opacity-20 transition">Technology</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h2 class="text-3xl md:text-5xl font-bold mb-4">Your Complete Islamic Companion</h2>
+                <p class="text-xl mb-6 opacity-90">Created by Noble Wave Organization. Accurate prayer times, Quran, Qibla direction, and more - all in one beautiful application.</p>
+                <div class="flex space-x-4">
+                    <button class="bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center">
+                        <i class="fab fa-apple mr-2"></i> App Store
+                    </button>
+                    <button class="bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition flex items-center">
+                        <i class="fab fa-google-play mr-2"></i> Play Store
+                    </button>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center">
+                <div class="relative w-64 h-96 md:w-80 md:h-[28rem] bg-white bg-opacity-10 rounded-3xl border border-white border-opacity-20 shadow-2xl overflow-hidden">
+                    <div class="absolute top-4 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-white bg-opacity-30 rounded-full"></div>
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-center mb-6">
+                            <div class="text-sm opacity-80">Today's Prayer Times</div>
+                            <div class="text-xl font-bold">Jeddah, Saudi Arabia</div>
+                        </div>
+                        <div class="flex-1 space-y-4">
+                            <div class="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-sun text-yellow-300 mr-3"></i>
+                                    <span>Fajr</span>
+                                </div>
+                                <span class="font-bold">4:45 AM</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-sun text-orange-400 mr-3"></i>
+                                    <span>Sunrise</span>
+                                </div>
+                                <span class="font-bold">6:02 AM</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-sun text-yellow-500 mr-3"></i>
+                                    <span>Dhuhr</span>
+                                </div>
+                                <span class="font-bold">12:15 PM</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-sun text-orange-500 mr-3"></i>
+                                    <span>Asr</span>
+                                </div>
+                                <span class="font-bold">3:45 PM</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg">
+                                <div class="flex items-center">
+                                    <i class="fas fa-moon text-purple-300 mr-3"></i>
+                                    <span>Maghrib</span>
+                                </div>
+                                <span class="font-bold">6:32 PM</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-center text-sm opacity-80">
+                            Next Prayer: <span class="font-bold">Isha</span> in 2h 15m
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Comprehensive Islamic Features</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Core Features -->
+                <div class="feature-card bg-blue-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-clock text-blue-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Prayer Times</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Accurate daily prayer times with multiple calculation methods and location-based adjustments.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-blue-500 mr-2"></i> Fajr, Dhuhr, Asr, Maghrib, Isha</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-blue-500 mr-2"></i> Imsak and Sunrise timing</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-blue-500 mr-2"></i> Multiple calculation methods</li>
+                    </ul>
+                </div>
+
+                <!-- Ramadan Mode -->
+                <div class="feature-card bg-purple-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-moon text-purple-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Ramadan Mode</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Special features for the blessed month including Sehri/Iftar alerts and Ramadan timetable.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-purple-500 mr-2"></i> Ramadan-specific UI themes</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-purple-500 mr-2"></i> Sehri and Iftar alerts</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-purple-500 mr-2"></i> Countdown timers</li>
+                    </ul>
+                </div>
+
+                <!-- Qibla Compass -->
+                <div class="feature-card bg-green-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-compass text-green-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Qibla Compass</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Real-time direction to Kaaba with magnetic field detection and compass error correction.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Precise direction finding</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Error detection</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Works worldwide</li>
+                    </ul>
+                </div>
+
+                <!-- Quran -->
+                <div class="feature-card bg-amber-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-amber-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-book-quran text-amber-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Quran</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Complete Quran with Arabic text, translations, bookmarks, and reading progress tracking.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-amber-500 mr-2"></i> Multiple translations</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-amber-500 mr-2"></i> Bookmarking system</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-amber-500 mr-2"></i> Search functionality</li>
+                    </ul>
+                </div>
+
+                <!-- Duas -->
+                <div class="feature-card bg-emerald-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-emerald-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-hands-praying text-emerald-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Daily Duas</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Categorized supplications for all occasions with audio recitation and text display.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-emerald-500 mr-2"></i> Morning/evening duas</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-emerald-500 mr-2"></i> Travel, eating, sleeping</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-emerald-500 mr-2"></i> Audio pronunciation</li>
+                    </ul>
+                </div>
+
+                <!-- Masjid Finder -->
+                <div class="feature-card bg-rose-50 rounded-xl p-6 transition duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-rose-100 flex items-center justify-center mr-4">
+                            <i class="fas fa-location-dot text-rose-600 text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold">Masjid Finder</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4">Locate nearby mosques with directions, prayer times, and contact information.</p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-rose-500 mr-2"></i> GPS-based search</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-rose-500 mr-2"></i> Prayer time schedules</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-rose-500 mr-2"></i> Map integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Overview -->
+    <section id="overview" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Feature Overview</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Left Column -->
+                <div>
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">1</span>
+                            Prayer Times & Alerts
+                        </h3>
+                        <p class="text-gray-600">Get accurate prayer times based on your location with multiple calculation methods (Umm al-Qura, ISNA, MWL, etc.). Receive customizable notifications and countdowns to each prayer.</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3">2</span>
+                            Ramadan Special Features
+                        </h3>
+                        <p class="text-gray-600">Special Ramadan mode with Sehri/Iftar alerts, countdown timers, and a dedicated timetable. The app automatically switches to Ramadan-themed colors during the holy month.</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3">3</span>
+                            Qibla Compass
+                        </h3>
+                        <p class="text-gray-600">Precise Qibla direction finder with magnetic field detection and compass error correction. Works anywhere in the world with clear visual indicators.</p>
+                    </div>
+                </div>
+                
+                <!-- Right Column -->
+                <div>
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mr-3">4</span>
+                            Quran & Islamic Resources
+                        </h3>
+                        <p class="text-gray-600">Complete Quran with Arabic text and translations in multiple languages. Includes daily duas, 99 Names of Allah, Six Kalimas, and educational content about the Five Pillars of Islam.</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mr-3">5</span>
+                            Community Features
+                        </h3>
+                        <p class="text-gray-600">Find nearby mosques and halal restaurants, ask questions to scholars, stay updated with Islamic news, and connect with local Islamic businesses and services.</p>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="text-xl font-semibold mb-4 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mr-3">6</span>
+                            Personalization
+                        </h3>
+                        <p class="text-gray-600">Customize your experience with multiple language support (English, Arabic, Urdu, etc.), theme options (day/night/Ramadan), and personalized prayer notifications.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack -->
+    <section id="tech" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Technology Stack</h2>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                        <i class="fab fa-microsoft text-4xl text-blue-600 mb-2"></i>
+                        <h4 class="font-semibold">Blazor</h4>
+                        <p class="text-sm text-gray-600">Frontend Framework</p>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                        <i class="fas fa-server text-4xl text-green-600 mb-2"></i>
+                        <h4 class="font-semibold">ASP.NET Core</h4>
+                        <p class="text-sm text-gray-600">Backend API</p>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                        <i class="fas fa-database text-4xl text-purple-600 mb-2"></i>
+                        <h4 class="font-semibold">PostgreSQL</h4>
+                        <p class="text-sm text-gray-600">Database</p>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg p-4 text-center">
+                        <i class="fas fa-map-marked-alt text-4xl text-red-600 mb-2"></i>
+                        <h4 class="font-semibold">AlAdhan API</h4>
+                        <p class="text-sm text-gray-600">Prayer Times</p>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-4">Why This Stack?</h3>
+                    <p class="text-gray-600 mb-4">We chose technologies that provide:</p>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span><strong>Performance:</strong> Blazor WebAssembly delivers near-native performance for complex UI interactions</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span><strong>Reliability:</strong> ASP.NET Core provides a robust backend with excellent scalability</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span><strong>Accuracy:</strong> AlAdhan API is trusted by millions for precise prayer time calculations</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-blue-500 mt-1 mr-2"></i>
+                            <span><strong>Cross-platform:</strong> Works seamlessly on mobile and web with responsive design</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quran Verse -->
+    <section class="py-16 bg-gradient-to-r from-blue-800 to-blue-600 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <i class="fas fa-quote-left text-3xl opacity-30 mb-4"></i>
+            <blockquote class="text-xl md:text-2xl max-w-3xl mx-auto font-serif mb-6">
+                "Indeed, the prayer is a prescribed duty that has to be performed at the appointed times."
+            </blockquote>
+            <p class="text-lg opacity-90">— Quran 4:103</p>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to Enhance Your Worship Experience?</h2>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">Download Noble Salah today and bring the beauty of Salah and the convenience of modern technology together.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition flex items-center justify-center">
+                    <i class="fab fa-apple text-2xl mr-3"></i>
+                    <div class="text-left">
+                        <div class="text-xs">Download on the</div>
+                        <div class="text-lg">App Store</div>
+                    </div>
+                </button>
+                <button class="bg-gray-800 hover:bg-gray-900 text-white px-8 py-4 rounded-lg font-semibold text-lg transition flex items-center justify-center">
+                    <i class="fab fa-google-play text-2xl mr-3"></i>
+                    <div class="text-left">
+                        <div class="text-xs">Get it on</div>
+                        <div class="text-lg">Google Play</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-mosque mr-2"></i> Noble Salah
+                    </h3>
+                    <p class="text-gray-400">Your complete Islamic companion for prayer, Quran, and daily worship.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Features</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Prayer Times</a></li>
+                        <li><a href="#" class="hover:text-white transition">Quran</a></li>
+                        <li><a href="#" class="hover:text-white transition">Qibla Compass</a></li>
+                        <li><a href="#" class="hover:text-white transition">Ramadan Tools</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Islamic Calendar</a></li>
+                        <li><a href="#" class="hover:text-white transition">Daily Duas</a></li>
+                        <li><a href="#" class="hover:text-white transition">99 Names of Allah</a></li>
+                        <li><a href="#" class="hover:text-white transition">Six Kalimas</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-lg mb-4">Connect</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-600 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-blue-400 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-red-600 transition">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center hover:bg-pink-600 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400">support@noble-wave.com</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500">
+                <p>&copy; 2023 Noble Salah by Noble Wave Organization. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Simple animation for feature cards on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = 0;
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
