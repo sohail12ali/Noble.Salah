@@ -8,74 +8,31 @@
     - Prayers: List of PrayerModel items to display.
     - NextPrayerName: The PrayerName enum indicating which slide should be active initially.
     - Height: Optional CSS height for the carousel (default: "200px").
+    - MaxHeight: Optional CSS max-height for the carousel (default: "400px").
 *@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-<style type="text/css">
-
-    .bounceIn {
-        opacity: 0;
-        animation-delay: 0.5s;
-        animation-duration: 0.5s;
-        animation-name: bounceIn;
-        animation-fill-mode: forwards;
-    }
-
-    .bounceOut {
-        animation-duration: 0.5s;
-        animation-name: bounceOut;
-        animation-fill-mode: forwards;
-    }
-
-    .backInDown {
-        opacity: 0;
-        animation-delay: 0.5s;
-        animation-duration: 0.5s;
-        animation-name: backInDown;
-        animation-fill-mode: forwards;
-    }
-
-    .backOutDown {
-        animation-duration: 0.5s;
-        animation-name: backOutDown;
-        animation-fill-mode: forwards;
-    }
-
-    .rotateIn {
-        opacity: 0;
-        animation-delay: 0.5s;
-        animation-duration: 0.5s;
-        animation-name: rotateIn;
-        animation-fill-mode: forwards;
-    }
-
-    .rotateOut {
-        animation-duration: 0.5s;
-        animation-name: rotateOut;
-        animation-fill-mode: forwards;
-    }
-</style>
 
 <MudCarousel TData="PrayerModel"
-             Class="mud-width-full"
+             Class="mud-width-full prayer-carousel-responsive"
              AutoCycle="false"
-             ShowArrows="true"
+             ShowArrows="false"
              ShowDelimiters="true"
              DelimiterIcon="@Icons.Material.Filled.Circle"
              PreventTimerRestart="true"
              @bind-SelectedIndex="activeSlideIndex"
-             Style="@($"height:{Height}; border-radius:20px;")">
+             Style="@($"height:{Height}; max-height:{MaxHeight}; border-radius:20px;")">
     @foreach (var prayer in Prayers)
     {
         <MudCarouselItem>
-            <MudPaper Class="pa-0 d-flex flex-column align-center justify-center"
+            <MudPaper Class="pa-0 d-flex flex-column align-center justify-center prayer-carousel-item"
                       Style="@GetPrayerCardStyle(prayer)">
                 <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
-                <div style="@GetPrayerTextStyle(prayer)">
-                    <MudText Typo="Typo.h3">@prayer.PrayerName</MudText>
-                    <MudText Typo="Typo.h5">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                <div style="@GetPrayerTextStyle(prayer)" class="prayer-carousel-text">
+                    <MudText Typo="Typo.h5" Class="prayer-carousel-title">@prayer.PrayerName</MudText>
+                    <MudText Typo="Typo.subtitle1" Class="prayer-carousel-time">@prayer.PrayerTime.ToShortTimeString()</MudText>
                     @if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
                     {
-                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Class="mt-2">
+                        <MudChip T="string" Color="Color.Success" Size="Size.Small" Class="mt-2 prayer-carousel-chip">
                             🕐
                         </MudChip>
                     }
@@ -114,7 +71,13 @@
     /// Height of the carousel (e.g. "200px").
     /// </summary>
     [Parameter]
-    public string Height { get; set; } = "500px";
+    public string Height { get; set; } = "350px"; // Default smaller for mobile
+
+    /// <summary>
+    /// Max height of the carousel (e.g. "400px").
+    /// </summary>
+    [Parameter]
+    public string MaxHeight { get; set; } = "400px";
 
     private int activeSlideIndex = 0;
     private bool isFirstRender = true;

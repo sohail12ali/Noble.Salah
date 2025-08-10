@@ -24,6 +24,7 @@ public struct AppConstants
         public const string EnableNotifications = "enableNotifications";
         public const string EnableAdhanAudio = "enableAdhanAudio";
         public const string EnableDarkMode = "enableDarkMode";
+        public const string SelectedTheme = "selectedTheme";
     }
 
     public struct Location

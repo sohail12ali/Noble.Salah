@@ -2,9 +2,11 @@
 @using Noble.Salah.Common.Constants
 @using Noble.Salah.Common.Enums
 @using Noble.Salah.Common.Interfaces
+@using Noble.Salah.UI.Shared.Services
 @inject IPrayerService PrayerService
 @inject ILocationService LocationService
 @inject ILocalStorage LocalStorage
+@inject ThemeManager ThemeManager
 
 <PageTitle>Settings - Noble Salah</PageTitle>
 
@@ -40,6 +42,24 @@
                     </MudSelect>
                 </MudItem>
             </MudGrid>
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Theme</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudSelect T="AppTheme"
+                       Label="App Theme"
+                       @bind-Value="selectedTheme"
+                       Variant="Variant.Outlined"
+                       OnValueChanged="OnThemeChanged">
+                @foreach (var theme in Enum.GetValues<AppTheme>())
+                {
+                    <MudSelectItem Value="@theme">@GetThemeDisplayName(theme)</MudSelectItem>
+                }
+            </MudSelect>
         </MudCardContent>
     </MudCard>
 
@@ -102,6 +122,7 @@
     private bool enableNotifications = true;
     private bool enableAdhanAudio = true;
     private bool enableDarkMode = false;
+    private AppTheme selectedTheme = AppTheme.System;
 
     protected override async Task OnInitializedAsync()
     {
@@ -141,6 +162,16 @@
         {
             enableDarkMode = bool.Parse(savedDarkMode);
         }
+
+        var savedTheme = await LocalStorage.LoadAsync<string>(AppConstants.Settings.SelectedTheme);
+        if (!string.IsNullOrEmpty(savedTheme) && Enum.TryParse<AppTheme>(savedTheme, out var theme))
+        {
+            selectedTheme = theme;
+        }
+        else
+        {
+            selectedTheme = ThemeManager.CurrentTheme;
+        }
     }
 
     private async Task UpdateLocationAsync()
@@ -167,6 +198,8 @@
         await LocalStorage.SaveAsync(AppConstants.Settings.EnableNotifications, enableNotifications.ToString());
         await LocalStorage.SaveAsync(AppConstants.Settings.EnableAdhanAudio, enableAdhanAudio.ToString());
         await LocalStorage.SaveAsync(AppConstants.Settings.EnableDarkMode, enableDarkMode.ToString());
+        await LocalStorage.SaveAsync(AppConstants.Settings.SelectedTheme, selectedTheme.ToString());
+        ThemeManager.ApplyTheme(selectedTheme);
 
         // Update prayer service with new settings
         if (currentLocation.HasValue)
@@ -182,4 +215,29 @@
         // Show success message
         // Note: In a real implementation, you'd use a notification service
     }
-} 
+
+    private Task OnThemeChanged(AppTheme theme)
+    {
+        ThemeManager.ApplyTheme(theme);
+        return LocalStorage.SaveAsync(AppConstants.Settings.SelectedTheme, theme.ToString());
+    }
+
+    private string GetThemeDisplayName(AppTheme theme)
+    {
+        return theme switch
+        {
+            AppTheme.System => "System Default",
+            AppTheme.LightDefault => "Light",
+            AppTheme.DarkDefault => "Dark",
+            AppTheme.OceanBreeze => "Ocean Breeze",
+            AppTheme.DesertSunset => "Desert Sunset",
+            AppTheme.NightSky => "Night Sky",
+            AppTheme.MorningDew => "Morning Dew",
+            AppTheme.GoldenMosque => "Golden Mosque",
+            AppTheme.RoyalPurple => "Royal Purple",
+            AppTheme.SerenityBlue => "Serenity Blue",
+            AppTheme.ForestHarmony => "Forest Harmony",
+            _ => theme.ToString()
+        };
+    }
+}

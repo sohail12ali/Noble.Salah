@@ -9,11 +9,11 @@ internal static class RegisterServices
     public static IServiceCollection AddDependencyServices(this IServiceCollection services)
     {
         services
-            .AddSingleton<ThemeManager>()
             .AddSingleton<IFormFactor, FormFactor>()
             .AddSingleton<IPrayerService, PrayerService>()
             .AddSingleton<ILocalStorage, BrowserLocalStorage>()
-            .AddSingleton<ILocationService, BrowserLocationService>();
+            .AddSingleton<ILocationService, BrowserLocationService>()
+            .AddSharedDependencyServices();
 
         return services;
     }

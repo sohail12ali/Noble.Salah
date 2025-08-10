@@ -1,16 +1,26 @@
 ﻿using MudBlazor;
 using Noble.Salah.Common.Enums;
+using Noble.Salah.Common.Interfaces;
 
 namespace Noble.Salah.UI.Shared.Services;
 
 public class ThemeManager
 {
+    private readonly ILocalStorage? _localStorage;
+    private const string ThemeKey = "App.SelectedTheme";
     public MudTheme Theme { get; private set; }
+    public AppTheme CurrentTheme { get; private set; } = AppTheme.System;
     public event Action<MudTheme>? ThemeChanged;
 
-    public ThemeManager()
+    // Default constructor for DI (legacy)
+    public ThemeManager() { Theme = GetDefaultTheme(); }
+
+    // New constructor for DI with ILocalStorage
+    public ThemeManager(ILocalStorage localStorage)
     {
+        _localStorage = localStorage;
         Theme = GetDefaultTheme();
+        _ = LoadThemeFromStorageAsync();
     }
 
     public MudTheme GetTheme(AppTheme appTheme)
@@ -36,6 +46,8 @@ public class ThemeManager
     {
         var theme = GetTheme(appTheme);
         SetTheme(theme);
+        CurrentTheme = appTheme;
+        _ = SaveThemeToStorageAsync(appTheme);
         return theme;
     }
 
@@ -43,6 +55,23 @@ public class ThemeManager
     {
         Theme = theme;
         ThemeChanged?.Invoke(theme);
+    }
+
+    private async Task SaveThemeToStorageAsync(AppTheme appTheme)
+    {
+        if (_localStorage != null)
+            await _localStorage.SaveAsync(ThemeKey, appTheme.ToString());
+    }
+
+    private async Task LoadThemeFromStorageAsync()
+    {
+        if (_localStorage == null) return;
+        var themeStr = await _localStorage.LoadAsync<string>(ThemeKey);
+        if (!string.IsNullOrEmpty(themeStr) && Enum.TryParse<AppTheme>(themeStr, out var savedTheme))
+        {
+            CurrentTheme = savedTheme;
+            SetTheme(GetTheme(savedTheme));
+        }
     }
 
     public static MudTheme GetDefaultTheme() => new()

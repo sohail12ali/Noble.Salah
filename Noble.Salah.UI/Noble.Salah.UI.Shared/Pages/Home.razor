@@ -24,45 +24,36 @@
     }
     else
     {
-        <MudCard Class="mb-4">
-            @if (prayers is not null && nextPrayerName is not null)
-            {
-                <MudCard Class="mb-4">
-                    <MudCardContent>
-                        <PrayerCarousel Prayers="prayers"
-                                        NextPrayerName="nextPrayerName.Value"
-                                        CurrentPrayerName="currentPrayerName"
-                                        ShowCurrentPrayerAsDefault="true" />
-                    </MudCardContent>
-                    <MudCardHeader>
-                        <MudText Typo="Typo.body2" Class="mt-2">
-                            @if (currentPrayerName.HasValue)
-                            {
-                                <span>Current Prayer: <strong>@currentPrayerName</strong></span>
-                                <span class="mx-2">|</span>
-                            }
-                            Next Prayer: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
-                        </MudText>
-                        @if (remainingTime > TimeSpan.Zero)
+        @if (prayers is not null && nextPrayerName is not null)
+        {
+            <MudCard Class="mb-4">
+                <MudCardContent>
+                    <PrayerCarousel Prayers="prayers"
+                                    NextPrayerName="nextPrayerName.Value"
+                                    CurrentPrayerName="currentPrayerName"
+                                    ShowCurrentPrayerAsDefault="true"
+                                    Height="180px"
+                                    MaxHeight="220px" />
+                </MudCardContent>
+                <MudCardHeader>
+                    <MudText Typo="Typo.body2" Class="mt-2">
+                        @if (currentPrayerName.HasValue)
                         {
-                            <MudText Typo="Typo.h4" Color="Color.Primary" Class="mt-2">
-                                ⏰ @GetRemainingTime()
-                            </MudText>
+                            <span>Current Prayer: <strong>@currentPrayerName</strong></span>
+                            <span class="mx-2">|</span>
                         }
-                    </MudCardHeader>
-                </MudCard>
-            }
-
-        </MudCard>
+                        Next Prayer: <strong>@nextPrayerName</strong> at <strong>@nextPrayerTime?.ToShortTimeString()</strong>
+                    </MudText>
+                    @if (remainingTime > TimeSpan.Zero)
+                    {
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Class="mt-2">
+                            ⏰ @GetRemainingTime()
+                        </MudText>
+                    }
+                </MudCardHeader>
+            </MudCard>
+        }
     }
-
-    <!-- Next Prayer Card -->
-    <MudPaper Class="pa-4 mb-4" Style="border-radius:20px; background-color:#2A2A2A;">
-        <MudText Typo="Typo.subtitle2" Color="Color.Info">@nextPrayerName</MudText>
-        <MudText Typo="Typo.h4" Color="Color.Primary">@nextPrayerTime?.ToString("hh:mm tt")</MudText>
-        <MudText Typo="Typo.caption" Color="Color.Secondary">@DateTime.Now.ToString("dd/MM/yyyy")</MudText>
-        <MudIcon Icon="@Icons.Material.Filled.WbSunny" Size="Size.Large" Color="Color.Warning" Class="mt-2" />
-    </MudPaper>
 
 </body>
 @code {

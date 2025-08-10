@@ -1,0 +1,91 @@
+/* Styles for PrayerCarousel component */
+
+.bounceIn {
+    opacity: 0;
+    animation-delay: 0.5s;
+    animation-duration: 0.5s;
+    animation-name: bounceIn;
+    animation-fill-mode: forwards;
+}
+
+.bounceOut {
+    animation-duration: 0.5s;
+    animation-name: bounceOut;
+    animation-fill-mode: forwards;
+}
+
+.backInDown {
+    opacity: 0;
+    animation-delay: 0.5s;
+    animation-duration: 0.5s;
+    animation-name: backInDown;
+    animation-fill-mode: forwards;
+}
+
+.backOutDown {
+    animation-duration: 0.5s;
+    animation-name: backOutDown;
+    animation-fill-mode: forwards;
+}
+
+.rotateIn {
+    opacity: 0;
+    animation-delay: 0.5s;
+    animation-duration: 0.5s;
+    animation-name: rotateIn;
+    animation-fill-mode: forwards;
+}
+
+.rotateOut {
+    animation-duration: 0.5s;
+    animation-name: rotateOut;
+    animation-fill-mode: forwards;
+}
+
+/* Responsive styles for PrayerCarousel */
+.prayer-carousel-responsive {
+    min-height: 180px;
+    max-width: 100vw;
+}
+
+.prayer-carousel-item {
+    min-height: 180px;
+}
+
+.prayer-carousel-title {
+    font-size: 2rem;
+}
+
+.prayer-carousel-time {
+    font-size: 1.2rem;
+}
+
+.prayer-carousel-chip {
+    font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+    .prayer-carousel-responsive {
+        height: 180px !important;
+        max-height: 220px !important;
+        min-height: 120px;
+        border-radius: 12px;
+    }
+    .prayer-carousel-item {
+        min-height: 120px;
+        padding: 0.5rem 0.2rem;
+    }
+    .prayer-carousel-title {
+        font-size: 1.1rem;
+    }
+    .prayer-carousel-time {
+        font-size: 0.95rem;
+    }
+    .prayer-carousel-chip {
+        font-size: 0.85rem;
+        padding: 0.2rem 0.5rem;
+    }
+    .prayer-carousel-text {
+        padding: 0.5rem !important;
+    }
+}
