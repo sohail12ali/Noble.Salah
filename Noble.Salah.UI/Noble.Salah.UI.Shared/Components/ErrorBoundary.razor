@@ -1,0 +1,54 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@if (CurrentException is not null)
+{
+    <div class="error-boundary">
+        <div class="error-content">
+            <h3>Something went wrong</h3>
+            <p>An unexpected error has occurred. Please try refreshing the page.</p>
+            @if (ShowDetails)
+            {
+                <details>
+                    <summary>Error Details</summary>
+                    <pre>@CurrentException.ToString()</pre>
+                </details>
+            }
+            <button @onclick="Recover" class="btn btn-primary">Try Again</button>
+            <button @onclick="RefreshPage" class="btn btn-secondary">Refresh Page</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public bool ShowDetails { get; set; } = false;
+
+    public Exception? CurrentException { get; private set; }
+
+    public void ProcessError(Exception exception)
+    {
+        CurrentException = exception;
+        StateHasChanged();
+    }
+
+    private void Recover()
+    {
+        CurrentException = null;
+        StateHasChanged();
+    }
+
+    private async Task RefreshPage()
+    {
+        // Use JavaScript to refresh the page
+        await JSRuntime.InvokeVoidAsync("location.reload");
+    }
+}

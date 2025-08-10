@@ -4,6 +4,7 @@
 @using Noble.Salah.Common.Interfaces
 @inject IPrayerService PrayerService
 @inject ILocationService LocationService
+@implements IDisposable
 
 <PageTitle>Prayer Calendar - Noble Salah</PageTitle>
 
@@ -102,53 +103,108 @@
     private DateTime selectedDate = DateTime.Today;
     private IList<PrayerModel>? selectedPrayers;
     private List<WeeklyPrayerData>? weeklyPrayers;
+    private bool _disposed = false;
 
     private record WeeklyPrayerData(DateTime Date, PrayerTimesModel PrayerTimes);
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadTodayPrayers();
-        await LoadWeeklyPrayers();
+        try
+        {
+            await LoadTodayPrayers();
+            await LoadWeeklyPrayers();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing Calendar page: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
     }
 
     private Task LoadTodayPrayers()
     {
-        selectedDate = DateTime.Today;
-        selectedPrayers = PrayerService.GetPrayers(selectedDate);
-        StateHasChanged();
+        if (_disposed) return Task.CompletedTask;
+
+        try
+        {
+            selectedDate = DateTime.Today;
+            selectedPrayers = PrayerService.GetPrayers(selectedDate);
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading today's prayers: {ex.Message}");
+        }
         return Task.CompletedTask;
     }
 
     private Task LoadWeeklyPrayers()
     {
-        weeklyPrayers = new List<WeeklyPrayerData>();
-        var startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
-        
-        for (int i = 0; i < 7; i++)
+        if (_disposed) return Task.CompletedTask;
+
+        try
         {
-            var date = startOfWeek.AddDays(i);
-            var prayerTimes = PrayerService.GetPrayerTimes(date);
-            weeklyPrayers.Add(new WeeklyPrayerData(date, prayerTimes));
+            weeklyPrayers = new List<WeeklyPrayerData>();
+            var startOfWeek = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            
+            for (int i = 0; i < 7; i++)
+            {
+                var date = startOfWeek.AddDays(i);
+                var prayerTimes = PrayerService.GetPrayerTimes(date);
+                weeklyPrayers.Add(new WeeklyPrayerData(date, prayerTimes));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading weekly prayers: {ex.Message}");
         }
         return Task.CompletedTask;
     }
 
     private Task OnDateChanged(DateTime? date)
     {
-        if (date.HasValue)
+        if (_disposed) return Task.CompletedTask;
+
+        try
         {
-            selectedDate = date.Value;
-            selectedPrayers = PrayerService.GetPrayers(selectedDate);
-            StateHasChanged();
+            if (date.HasValue)
+            {
+                selectedDate = date.Value;
+                selectedPrayers = PrayerService.GetPrayers(selectedDate);
+                if (!_disposed)
+                {
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error changing date: {ex.Message}");
         }
         return Task.CompletedTask;
     }
 
     protected override Task OnParametersSetAsync()
     {
-        if (selectedPrayers is null || selectedPrayers.FirstOrDefault()?.PrayerTime.Date != selectedDate.Date)
+        if (_disposed) return Task.CompletedTask;
+
+        try
         {
-            selectedPrayers = PrayerService.GetPrayers(selectedDate);
+            if (selectedPrayers is null || selectedPrayers.FirstOrDefault()?.PrayerTime.Date != selectedDate.Date)
+            {
+                selectedPrayers = PrayerService.GetPrayers(selectedDate);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in OnParametersSetAsync: {ex.Message}");
         }
         return Task.CompletedTask;
     }

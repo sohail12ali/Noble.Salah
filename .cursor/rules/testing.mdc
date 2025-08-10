@@ -1,0 +1,222 @@
+# Testing Rules and Guidelines
+
+## Unit Testing
+
+### Test Structure
+- Follow AAA pattern (Arrange, Act, Assert)
+- Use descriptive test names
+- Group related tests in test classes
+- Use appropriate test attributes
+
+### Test Naming Convention
+```csharp
+[Fact]
+public void MethodName_Scenario_ExpectedBehavior()
+{
+    // Arrange
+    // Act
+    // Assert
+}
+```
+
+### Test Coverage
+- Test all business logic methods
+- Cover edge cases and error conditions
+- Test validation logic
+- Achieve minimum 80% code coverage
+
+### Mocking Strategy
+- Mock external dependencies
+- Use dependency injection for testability
+- Mock time-dependent operations
+- Avoid mocking internal implementation details
+
+## Integration Testing
+
+### Service Integration
+- Test service interactions
+- Verify data flow between components
+- Test configuration scenarios
+- Validate error handling
+
+### Component Testing
+- Test component rendering
+- Verify parameter handling
+- Test event callbacks
+- Validate accessibility features
+
+### Database Integration
+- Use test databases or in-memory providers
+- Clean up test data after each test
+- Test data persistence
+- Validate data integrity
+
+## Prayer Calculation Testing
+
+### Calculation Accuracy
+- Test all calculation methods
+- Verify timezone conversions
+- Test edge cases (polar regions)
+- Compare with known reference data
+
+### Location Services
+- Test GPS integration
+- Verify IP-based fallback
+- Test permission handling
+- Validate location caching
+
+### Performance Testing
+- Test calculation performance
+- Verify caching effectiveness
+- Test memory usage
+- Validate response times
+
+## UI Testing
+
+### Component Testing
+- Test component rendering
+- Verify responsive behavior
+- Test theme switching
+- Validate accessibility
+
+### User Interaction Testing
+- Test button clicks and form submissions
+- Verify navigation flows
+- Test keyboard navigation
+- Validate screen reader support
+
+### Cross-Platform Testing
+- Test on all target platforms
+- Verify platform-specific features
+- Test responsive layouts
+- Validate platform integrations
+
+## Performance Testing
+
+### Load Testing
+- Test application startup time
+- Verify memory usage patterns
+- Test calculation performance
+- Validate caching effectiveness
+
+### Stress Testing
+- Test with large datasets
+- Verify error handling under load
+- Test concurrent operations
+- Validate resource cleanup
+
+### PWA Testing
+- Test offline functionality
+- Verify service worker behavior
+- Test cache management
+- Validate update mechanisms
+
+## Accessibility Testing
+
+### Screen Reader Testing
+- Test with NVDA (Windows)
+- Test with VoiceOver (macOS/iOS)
+- Test with TalkBack (Android)
+- Verify semantic markup
+
+### Keyboard Navigation
+- Test Tab key navigation
+- Verify Enter/Space activation
+- Test arrow key navigation
+- Validate focus management
+
+### Color and Contrast
+- Test color contrast compliance
+- Verify high contrast mode
+- Test with colorblind users
+- Validate theme accessibility
+
+## Test Data Management
+
+### Test Data Creation
+- Use factories for test data
+- Create realistic test scenarios
+- Use consistent test data
+- Document test data requirements
+
+### Test Data Cleanup
+- Clean up after each test
+- Use test isolation
+- Avoid test interdependencies
+- Implement proper teardown
+
+### Test Configuration
+- Use separate test configuration
+- Mock external services
+- Use in-memory databases
+- Configure test logging
+
+## Test Automation
+
+### CI/CD Integration
+- Run tests on every build
+- Fail builds on test failures
+- Generate test reports
+- Track test metrics
+
+### Test Execution
+- Run tests in parallel when possible
+- Use appropriate test categories
+- Implement test timeouts
+- Handle flaky tests
+
+### Test Reporting
+- Generate detailed test reports
+- Track test coverage metrics
+- Monitor test execution times
+- Identify test bottlenecks
+
+## Test Maintenance
+
+### Test Documentation
+- Document test scenarios
+- Explain complex test logic
+- Maintain test data documentation
+- Update tests with code changes
+
+### Test Refactoring
+- Refactor tests for maintainability
+- Remove duplicate test code
+- Improve test readability
+- Update test patterns
+
+### Test Review
+- Review tests during code review
+- Ensure test quality
+- Verify test coverage
+- Validate test effectiveness
+
+## Best Practices
+
+### Test Independence
+- Each test should be independent
+- Avoid test ordering dependencies
+- Use unique test data
+- Implement proper isolation
+
+### Test Reliability
+- Avoid flaky tests
+- Use stable test data
+- Implement proper timeouts
+- Handle async operations correctly
+
+### Test Performance
+- Keep tests fast
+- Use appropriate test categories
+- Implement test parallelization
+- Monitor test execution times
+
+### Test Organization
+- Organize tests logically
+- Use descriptive test names
+- Group related tests
+- Maintain test structure
+description:
+globs:
+alwaysApply: false
+---

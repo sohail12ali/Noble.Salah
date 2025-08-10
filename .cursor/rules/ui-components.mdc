@@ -1,0 +1,155 @@
+# UI Component Development Rules
+
+## MudBlazor Component Guidelines
+
+### Component Structure
+- Use MudBlazor components for consistent Material Design
+- Follow MudBlazor naming conventions
+- Implement responsive design with MudGrid
+- Use MudTheme for theming support
+
+### Component Architecture
+- Place shared components in `Noble.Salah.UI.Shared/Components`
+- Use parameters for data input
+- Use events for user interactions
+- Implement proper lifecycle management
+
+### Responsive Design
+- Use MudGrid for responsive layouts
+- Implement mobile-first design approach
+- Test on multiple screen sizes
+- Handle orientation changes
+
+## Component Patterns
+
+### Data Display Components
+```razor
+@code {
+    [Parameter, EditorRequired]
+    public IList<PrayerModel> Prayers { get; set; } = new List<PrayerModel>();
+    
+    [Parameter]
+    public PrayerName? CurrentPrayerName { get; set; }
+    
+    [Parameter]
+    public EventCallback<PrayerModel> OnPrayerSelected { get; set; }
+}
+```
+
+### State Management
+- Use component parameters for data
+- Implement local state when needed
+- Use events for parent communication
+- Avoid complex state in components
+
+### Lifecycle Management
+- Implement IDisposable for cleanup
+- Handle timer disposal properly
+- Manage event subscriptions
+- Clean up resources on component disposal
+
+## Theme System
+
+### Theme Implementation
+- Use ThemeManager for theme switching
+- Support light/dark mode
+- Implement RTL support for Arabic/Urdu
+- Ensure accessibility compliance
+
+### Color Usage
+- Use theme colors consistently
+- Support high contrast mode
+- Ensure color contrast compliance
+- Test with colorblind users
+
+### Typography
+- Use consistent font sizes
+- Support font scaling
+- Implement proper text hierarchy
+- Handle text overflow gracefully
+
+## Accessibility
+
+### ARIA Support
+- Use appropriate ARIA attributes
+- Implement proper labels
+- Support screen readers
+- Handle keyboard navigation
+
+### Keyboard Navigation
+- Support Tab key navigation
+- Implement Enter/Space activation
+- Handle arrow key navigation
+- Provide focus indicators
+
+### Screen Reader Support
+- Use semantic HTML elements
+- Provide alternative text
+- Implement proper headings
+- Test with screen readers
+
+## Performance Optimization
+
+### Rendering Optimization
+- Use `@key` directive for lists
+- Implement `ShouldRender()`
+- Avoid unnecessary renders
+- Use virtual scrolling for large lists
+
+### Resource Management
+- Lazy load components when possible
+- Optimize image loading
+- Implement proper caching
+- Monitor memory usage
+
+### Component Reuse
+- Create reusable components
+- Use composition over inheritance
+- Implement proper abstraction
+- Document component APIs
+
+## Error Handling
+
+### User-Friendly Errors
+- Display meaningful error messages
+- Provide recovery options
+- Handle loading states
+- Implement retry mechanisms
+
+### Graceful Degradation
+- Handle missing data gracefully
+- Provide fallback content
+- Implement offline support
+- Handle network errors
+
+## Testing
+
+### Component Testing
+- Test component rendering
+- Verify parameter handling
+- Test event callbacks
+- Validate accessibility
+
+### Integration Testing
+- Test component interactions
+- Verify data flow
+- Test responsive behavior
+- Validate theme switching
+
+## Documentation
+
+### Component Documentation
+- Document all parameters
+- Provide usage examples
+- Include accessibility notes
+- Maintain API documentation
+
+### Code Comments
+- Comment complex logic
+- Explain business rules
+- Document edge cases
+- Include TODO comments for future work
+description:
+globs:
+alwaysApply: false
+---

@@ -86,3 +86,377 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Modern high contrast mode support - replaces deprecated -ms-high-contrast */
+@media (forced-colors: active) {
+    /* High contrast mode styles */
+    .mud-button {
+        border: 1px solid CanvasText;
+    }
+    
+    .mud-card {
+        border: 1px solid CanvasText;
+    }
+    
+    .mud-text {
+        color: CanvasText;
+    }
+    
+    .mud-paper {
+        background-color: Canvas;
+        border: 1px solid CanvasText;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Focus indicators for better accessibility */
+.mud-button:focus,
+.mud-card:focus,
+.mud-nav-link:focus {
+    outline: 2px solid #1976D2;
+    outline-offset: 2px;
+}
+
+/* High contrast focus indicators */
+@media (forced-colors: active) {
+    .mud-button:focus,
+    .mud-card:focus,
+    .mud-nav-link:focus {
+        outline: 2px solid CanvasText;
+        outline-offset: 2px;
+    }
+}
+
+/* Prayer Tracker Styles */
+.prayer-tracker-card {
+    margin-bottom: 1rem;
+}
+
+.prayer-item {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.prayer-item:hover {
+    border-color: var(--mud-palette-primary);
+    transform: translateY(-2px);
+}
+
+/* Tasbeeh Counter Styles */
+.tasbeeh-counter-card {
+    margin-bottom: 1rem;
+}
+
+.preset-item {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.preset-item:hover {
+    border-color: var(--mud-palette-primary);
+    background-color: var(--mud-palette-primary-hover);
+}
+
+/* Qibla Compass Styles */
+.qibla-compass-card {
+    margin-bottom: 1rem;
+}
+
+.compass-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.compass-rose {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--mud-palette-primary);
+    border-radius: 50%;
+    transition: transform 0.5s ease;
+}
+
+.compass-needle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--mud-palette-primary) 0%, var(--mud-palette-primary) 50%, var(--mud-palette-error) 50%, var(--mud-palette-error) 100%);
+    transform: translate(-50%, -50%);
+    border-radius: 2px;
+    z-index: 2;
+}
+
+.compass-directions {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.direction-n,
+.direction-e,
+.direction-s,
+.direction-w {
+    position: absolute;
+    font-weight: bold;
+    color: var(--mud-palette-primary);
+    font-size: 1.2rem;
+}
+
+.direction-n {
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.direction-e {
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.direction-s {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.direction-w {
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+}
+
+.qibla-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    padding: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .compass-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .compass-needle {
+        height: 60px;
+    }
+    
+    .direction-n,
+    .direction-e,
+    .direction-s,
+    .direction-w {
+        font-size: 1rem;
+    }
+}
+
+/* Animation for completed prayers */
+@keyframes prayerCompleted {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.prayer-item.completed {
+    animation: prayerCompleted 0.5s ease;
+    background-color: var(--mud-palette-success-hover);
+}
+
+/* Tasbeeh counter animations */
+@keyframes tasbeehIncrement {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.tasbeeh-counter-card .mud-text.h1 {
+    transition: all 0.3s ease;
+}
+
+.tasbeeh-counter-card .mud-text.h1:active {
+    animation: tasbeehIncrement 0.2s ease;
+}
+
+/* Feature Cards */
+.feature-card {
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.feature-card:hover {
+    border-color: var(--mud-palette-primary);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* High contrast mode for new components */
+@media (forced-colors: active) {
+    .prayer-item {
+        border: 1px solid CanvasText;
+    }
+    
+    .prayer-item:hover {
+        border-color: CanvasText;
+        background-color: Canvas;
+    }
+    
+    .preset-item {
+        border: 1px solid CanvasText;
+    }
+    
+    .preset-item:hover {
+        border-color: CanvasText;
+        background-color: Canvas;
+    }
+    
+    .compass-rose {
+        border-color: CanvasText;
+    }
+    
+    .compass-needle {
+        background: CanvasText;
+    }
+    
+    .direction-n,
+    .direction-e,
+    .direction-s,
+    .direction-w {
+        color: CanvasText;
+    }
+    
+    .qibla-indicator {
+        background: Canvas;
+        border: 1px solid CanvasText;
+    }
+    
+    .feature-card {
+        border: 1px solid CanvasText;
+    }
+    
+    .feature-card:hover {
+        border-color: CanvasText;
+        background-color: Canvas;
+    }
+}
+
+/* Error boundary styles */
+.error-boundary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f5f5f5;
+}
+
+.error-content {
+    max-width: 600px;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.error-content h3 {
+    color: #d32f2f;
+    margin-bottom: 1rem;
+}
+
+.error-content p {
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.error-content details {
+    margin: 1rem 0;
+    text-align: left;
+}
+
+.error-content pre {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.error-content .btn {
+    background: #1976D2;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+}
+
+.error-content .btn:hover {
+    background: #1565C0;
+}
+
+/* High contrast mode for error boundary */
+@media (forced-colors: active) {
+    .error-boundary {
+        background-color: Canvas;
+    }
+    
+    .error-content {
+        background: Canvas;
+        border: 1px solid CanvasText;
+    }
+    
+    .error-content h3 {
+        color: CanvasText;
+    }
+    
+    .error-content p {
+        color: CanvasText;
+    }
+    
+    .error-content pre {
+        background: Canvas;
+        border: 1px solid CanvasText;
+        color: CanvasText;
+    }
+    
+    .error-content .btn {
+        background: CanvasText;
+        color: Canvas;
+        border: 1px solid CanvasText;
+    }
+}

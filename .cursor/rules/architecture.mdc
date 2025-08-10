@@ -1,0 +1,203 @@
+# Architecture and Service Design Rules
+
+## Clean Architecture Principles
+
+### Project Structure
+- **Noble.Salah.Common**: Core interfaces and models
+- **Noble.Salah.Integration**: Core services and external integrations
+- **Noble.Salah.UI**: MAUI Blazor application
+- **Noble.Salah.UI.Web**: Blazor WebAssembly
+- **Noble.Salah.UI.Shared**: Shared UI components
+- **Noble.Salah.AppHost**: .NET Aspire host
+- **Noble.Salah.ServiceDefaults**: Shared configurations
+
+### Separation of Concerns
+- UI logic stays in UI projects
+- Business logic goes in Common/Integration
+- Configuration in ServiceDefaults
+- Platform-specific code in respective UI projects
+
+## Service Architecture
+
+### Interface Design
+- Define interfaces in `Noble.Salah.Common/Interfaces`
+- Use descriptive interface names (IPrayerService, ILocationService)
+- Include comprehensive method signatures
+- Document interface contracts
+
+### Service Implementation
+- Implement core logic in `Noble.Salah.Integration/Services`
+- Platform-specific implementations in UI projects
+- Use dependency injection for service registration
+- Follow singleton pattern for global state
+
+### Service Registration
+```csharp
+// Common services
+services.AddScoped<IPrayerService, PrayerService>();
+
+// Platform-specific services
+services.AddScoped<ILocationService, MauiLocationService>();
+services.AddScoped<ILocalStorage, MauiLocalStorage>();
+```
+
+## Dependency Injection
+
+### Service Lifetime
+- **Singleton**: Global state (prayers, location, theme)
+- **Scoped**: Request-scoped services
+- **Transient**: Lightweight, stateless services
+
+### Constructor Injection
+- Use constructor injection for dependencies
+- Avoid service locator pattern
+- Validate required dependencies
+- Handle optional dependencies gracefully
+
+### Configuration
+- Use options pattern for complex configurations
+- Validate configuration on startup
+- Provide default values
+- Support environment-specific overrides
+
+## Data Models
+
+### Model Design
+- Use immutable models where possible
+- Implement proper validation in constructors
+- Use appropriate data types
+- Include comprehensive documentation
+
+### Validation
+- Validate input parameters
+- Use data annotations where appropriate
+- Implement custom validation logic
+- Provide meaningful error messages
+
+### Serialization
+- Use JSON serialization for API communication
+- Implement proper serialization attributes
+- Handle circular references
+- Support versioning for model changes
+
+## Error Handling
+
+### Exception Strategy
+- Define custom exceptions in Common
+- Handle platform-specific errors in UI
+- Use consistent logging patterns
+- Provide user-friendly error messages
+
+### Logging
+- Use structured logging
+- Include correlation IDs
+- Log appropriate levels (Debug, Info, Warning, Error)
+- Implement log aggregation
+
+### Recovery Mechanisms
+- Implement retry policies
+- Provide fallback mechanisms
+- Handle partial failures gracefully
+- Maintain service availability
+
+## Configuration Management
+
+### AppSettings
+- Use appsettings.json for configuration
+- Override in platform-specific projects
+- Support environment variables
+- Implement configuration validation
+
+### Environment-Specific Config
+- Development: Detailed logging, debug features
+- Production: Optimized performance, minimal logging
+- Staging: Production-like with additional monitoring
+
+### Security
+- Never hardcode sensitive values
+- Use secure configuration providers
+- Implement configuration encryption
+- Validate configuration on startup
+
+## Cross-Platform Considerations
+
+### Platform Abstraction
+- Use `IFormFactor` for platform detection
+- Implement platform-specific services
+- Handle platform differences gracefully
+- Test on all target platforms
+
+### Service Implementation
+- MAUI: Use native platform APIs
+- Web: Use browser APIs and web services
+- Shared: Use common interfaces
+
+### Feature Detection
+- Detect platform capabilities
+- Implement feature flags
+- Provide fallback implementations
+- Handle unsupported features gracefully
+
+## Performance Optimization
+
+### Caching Strategy
+- Cache frequently accessed data
+- Implement cache invalidation
+- Use appropriate cache lifetimes
+- Monitor cache performance
+
+### Resource Management
+- Dispose of resources properly
+- Implement connection pooling
+- Use async/await patterns
+- Monitor memory usage
+
+### Background Processing
+- Use background services for heavy operations
+- Implement progress reporting
+- Handle cancellation gracefully
+- Monitor background task performance
+
+## Testing Architecture
+
+### Unit Testing
+- Test all business logic
+- Mock external dependencies
+- Use meaningful test names
+- Follow AAA pattern
+
+### Integration Testing
+- Test service interactions
+- Verify data flow
+- Test configuration scenarios
+- Validate error handling
+
+### End-to-End Testing
+- Test complete user workflows
+- Verify cross-platform functionality
+- Test performance under load
+- Validate accessibility requirements
+
+## Documentation
+
+### Architecture Documentation
+- Document design decisions
+- Maintain architecture diagrams
+- Update implementation status
+- Document integration points
+
+### API Documentation
+- Document all public APIs
+- Include usage examples
+- Maintain changelog
+- Provide migration guides
+
+### Code Documentation
+- Write doc comments for all public members
+- Document complex business logic
+- Include usage examples
+- Maintain inline documentation
+description:
+globs:
+alwaysApply: false
+---

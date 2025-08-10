@@ -1,0 +1,161 @@
+@page "/debug"
+@using Noble.Salah.Common.Interfaces
+@inject ILocalStorage LocalStorage
+@inject ILocationService LocationService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Debug - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="pa-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Debug Information</MudText>
+    
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Navigation Status</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudText>Current URI: @NavigationManager.Uri</MudText>
+            <MudText>Base URI: @NavigationManager.BaseUri</MudText>
+            <MudButton Color="Color.Primary" OnClick="TestNavigation" Class="mt-2">
+                Test Navigation to Home
+            </MudButton>
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Local Storage Test</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTextField @bind-Value="testKey" Label="Test Key" />
+            <MudTextField @bind-Value="testValue" Label="Test Value" />
+            <MudButton Color="Color.Primary" OnClick="TestLocalStorage" Class="mt-2">
+                Test Local Storage
+            </MudButton>
+            @if (!string.IsNullOrEmpty(storageResult))
+            {
+                <MudText Class="mt-2">Result: @storageResult</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Location Service Test</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudButton Color="Color.Primary" OnClick="TestLocationService" Class="mt-2">
+                Test Location Service
+            </MudButton>
+            @if (!string.IsNullOrEmpty(locationResult))
+            {
+                <MudText Class="mt-2">Result: @locationResult</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Performance Test</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudButton Color="Color.Primary" OnClick="TestPerformance" Class="mt-2">
+                Run Performance Test
+            </MudButton>
+            @if (performanceResult > 0)
+            {
+                <MudText Class="mt-2">Execution time: @performanceResult ms</MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+
+    <MudCard Class="mb-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Error Test</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudButton Color="Color.Error" OnClick="TestErrorHandling" Class="mt-2">
+                Test Error Handling
+            </MudButton>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    private string testKey = "debug_test";
+    private string testValue = "test_value";
+    private string storageResult = "";
+    private string locationResult = "";
+    private long performanceResult = 0;
+
+    private void TestNavigation()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Navigation error: {ex.Message}");
+        }
+    }
+
+    private async Task TestLocalStorage()
+    {
+        try
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            await LocalStorage.SaveAsync(testKey, testValue);
+            var loadedValue = await LocalStorage.LoadAsync<string>(testKey);
+            
+            stopwatch.Stop();
+            storageResult = $"Save/Load completed in {stopwatch.ElapsedMilliseconds}ms. Loaded value: {loadedValue}";
+        }
+        catch (Exception ex)
+        {
+            storageResult = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task TestLocationService()
+    {
+        try
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            
+            var location = await LocationService.GetCurrentLocationAsync();
+            var timezone = await LocationService.GetLocalTimeZoneIdAsync();
+            
+            stopwatch.Stop();
+            locationResult = $"Location service completed in {stopwatch.ElapsedMilliseconds}ms. Location: {location}, Timezone: {timezone}";
+        }
+        catch (Exception ex)
+        {
+            locationResult = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task TestPerformance()
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        
+        // Simulate some work
+        await Task.Delay(100);
+        
+        stopwatch.Stop();
+        performanceResult = stopwatch.ElapsedMilliseconds;
+    }
+
+    private void TestErrorHandling()
+    {
+        try
+        {
+            throw new InvalidOperationException("This is a test error for debugging purposes.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Test error caught: {ex.Message}");
+        }
+    }
+}

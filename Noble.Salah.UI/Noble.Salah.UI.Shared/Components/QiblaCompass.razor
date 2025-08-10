@@ -1,0 +1,180 @@
+@using Noble.Salah.Common.Interfaces
+@using MudBlazor
+@inject ILocationService LocationService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<MudCard Class="qibla-compass-card">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Qibla Compass</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">Direction to Kaaba</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <div class="text-center">
+            @if (IsLoading)
+            {
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+                <MudText Typo="Typo.body1" Class="mt-3">Getting your location...</MudText>
+            }
+            else if (HasError)
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-3">
+                    <MudText Typo="Typo.body1">Unable to get location</MudText>
+                    <MudText Typo="Typo.body2">Please enable location services and try again</MudText>
+                </MudAlert>
+                <MudButton 
+                    Variant="Variant.Filled" 
+                    Color="Color.Primary" 
+                    OnClick="GetLocationAsync">
+                    Try Again
+                </MudButton>
+            }
+            else if (QiblaDirection.HasValue)
+            {
+                <div class="compass-container">
+                    <div class="compass-rose" style="transform: rotate(@(-QiblaDirection.Value)deg)">
+                        <div class="compass-needle"></div>
+                        <div class="compass-directions">
+                            <div class="direction-n">N</div>
+                            <div class="direction-e">E</div>
+                            <div class="direction-s">S</div>
+                            <div class="direction-w">W</div>
+                        </div>
+                    </div>
+                    <div class="qibla-indicator">
+                        <MudIcon Icon="@Icons.Material.Filled.LocationOn" Color="Color.Primary" Size="Size.Large" />
+                    </div>
+                </div>
+                
+                <MudText Typo="Typo.h6" Class="mt-3">@QiblaDirection.Value:F0}°</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">Direction to Kaaba</MudText>
+                
+                @if (Location != null)
+                {
+                    <MudDivider Class="my-3" />
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Your Location: @Location.Latitude:F4}, @Location.Longitude:F4}
+                    </MudText>
+                }
+                
+                <MudButton 
+                    Variant="Variant.Outlined" 
+                    Color="Color.Primary" 
+                    Class="mt-3"
+                    OnClick="GetLocationAsync">
+                    Refresh
+                </MudButton>
+            }
+            else
+            {
+                <MudText Typo="Typo.body1" Class="mb-3">Get your location to find Qibla direction</MudText>
+                <MudButton 
+                    Variant="Variant.Filled" 
+                    Color="Color.Primary" 
+                    OnClick="GetLocationAsync">
+                    Get Location
+                </MudButton>
+            }
+        </div>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private bool IsLoading { get; set; }
+    private bool HasError { get; set; }
+    private double? QiblaDirection { get; set; }
+    private Noble.Salah.Common.Models.Geolocation? Location { get; set; }
+    private bool _disposed = false;
+
+    // Kaaba coordinates (Mecca, Saudi Arabia)
+    private const double KaabaLatitude = 21.4225;
+    private const double KaabaLongitude = 39.8262;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await GetLocationAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing QiblaCompass: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+    private async Task GetLocationAsync()
+    {
+        if (_disposed) return;
+
+        IsLoading = true;
+        HasError = false;
+        
+        if (!_disposed)
+        {
+            StateHasChanged();
+        }
+
+        try
+        {
+            var location = await LocationService.GetCurrentLocationAsync();
+            
+            if (location.HasValue && !_disposed)
+            {
+                Location = new Noble.Salah.Common.Models.Geolocation
+                {
+                    Latitude = location.Value.Latitude,
+                    Longitude = location.Value.Longitude
+                };
+                QiblaDirection = CalculateQiblaDirection(Location.Latitude, Location.Longitude);
+            }
+            else if (!_disposed)
+            {
+                HasError = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting location: {ex.Message}");
+            if (!_disposed)
+            {
+                HasError = true;
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Calculates the Qibla direction using the great circle formula
+    /// </summary>
+    private double CalculateQiblaDirection(double latitude, double longitude)
+    {
+        // Convert to radians
+        var lat1 = latitude * Math.PI / 180;
+        var lon1 = longitude * Math.PI / 180;
+        var lat2 = KaabaLatitude * Math.PI / 180;
+        var lon2 = KaabaLongitude * Math.PI / 180;
+
+        // Calculate the bearing
+        var y = Math.Sin(lon2 - lon1) * Math.Cos(lat2);
+        var x = Math.Cos(lat1) * Math.Sin(lat2) - Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(lon2 - lon1);
+        
+        var bearing = Math.Atan2(y, x) * 180 / Math.PI;
+        
+        // Convert to compass bearing (0-360 degrees)
+        bearing = (bearing + 360) % 360;
+        
+        return bearing;
+    }
+}

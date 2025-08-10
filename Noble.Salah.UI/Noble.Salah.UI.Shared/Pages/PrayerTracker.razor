@@ -1,0 +1,316 @@
+@page "/prayer-tracker"
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Interfaces
+@using MudBlazor
+@using MudBlazor.Components
+@inject IPrayerService PrayerService
+@inject IPrayerTrackingService PrayerTrackingService
+@implements IDisposable
+
+<PageTitle>Prayer Tracker - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Prayer Tracker</MudText>
+    
+    @if (isLoading)
+    {
+        <MudCard Class="mb-4">
+            <MudCardContent Class="pa-4">
+                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" Class="d-flex justify-center" />
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-3">
+                    Loading prayer tracker...
+                </MudText>
+            </MudCardContent>
+        </MudCard>
+    }
+    else
+    {
+        <MudGrid>
+            <MudItem xs="12" md="8">
+                <MudCard Class="prayer-tracker-card">
+                    <MudCardHeader>
+                        <MudText Typo="Typo.h6">Today's Prayers</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Track your daily prayers</MudText>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        @if (Prayers.Any())
+                        {
+                            <MudGrid>
+                                @foreach (var prayer in Prayers)
+                                {
+                                    <MudItem xs="12" sm="6" md="4">
+                                        <MudPaper Class="pa-3 prayer-item" Elevation="2">
+                                            <div class="d-flex align-center justify-space-between">
+                                                <div>
+                                                    <MudText Typo="Typo.h6">@prayer.PrayerName</MudText>
+                                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@prayer.FormattedTime</MudText>
+                                                </div>
+                                                <div class="d-flex align-center">
+                                                    @if (prayer.IsCompleted)
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                                                        <MudText Typo="Typo.body2" Color="Color.Success" Class="ml-2">Completed</MudText>
+                                                    }
+                                                    else if (prayer.IsCurrentPrayer)
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" />
+                                                        <MudText Typo="Typo.body2" Color="Color.Primary" Class="ml-2">Current</MudText>
+                                                    }
+                                                    else if (prayer.IsNextPrayer)
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.Upcoming" Color="Color.Warning" />
+                                                        <MudText Typo="Typo.body2" Color="Color.Warning" Class="ml-2">Next</MudText>
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" />
+                                                        <MudText Typo="Typo.body2" Color="Color.Default" Class="ml-2">Pending</MudText>
+                                                    }
+                                                </div>
+                                            </div>
+                                            
+                                            @if (!prayer.IsCompleted && (prayer.IsCurrentPrayer || DateTime.Now > prayer.PrayerTime))
+                                            {
+                                                <MudButton 
+                                                    Variant="Variant.Filled" 
+                                                    Color="Color.Primary" 
+                                                    Size="Size.Small"
+                                                    Class="mt-2"
+                                                    OnClick="() => MarkPrayerCompleted(prayer.PrayerName)">
+                                                    Mark as Completed
+                                                </MudButton>
+                                            }
+                                        </MudPaper>
+                                    </MudItem>
+                                }
+                            </MudGrid>
+                        }
+                        else
+                        {
+                            <MudText Typo="Typo.body1" Class="text-center">No prayers available for today.</MudText>
+                        }
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" md="4">
+                @if (Statistics != null)
+                {
+                    <MudCard>
+                        <MudCardHeader>
+                            <MudText Typo="Typo.h6">Prayer Statistics</MudText>
+                        </MudCardHeader>
+                        <MudCardContent>
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudPaper Class="pa-3 text-center">
+                                        <MudText Typo="Typo.h4" Color="Color.Primary">@Statistics.CompletionPercentage:F0}%</MudText>
+                                        <MudText Typo="Typo.body2">Today</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudPaper Class="pa-3 text-center">
+                                        <MudText Typo="Typo.h4" Color="Color.Success">@Statistics.CurrentStreak</MudText>
+                                        <MudText Typo="Typo.body2">Day Streak</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudPaper Class="pa-3 text-center">
+                                        <MudText Typo="Typo.h4" Color="Color.Info">@Statistics.TotalCompleted</MudText>
+                                        <MudText Typo="Typo.body2">Completed</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudPaper Class="pa-3 text-center">
+                                        <MudText Typo="Typo.h4" Color="Color.Warning">@Statistics.LongestStreak</MudText>
+                                        <MudText Typo="Typo.body2">Best Streak</MudText>
+                                    </MudPaper>
+                                </MudItem>
+                            </MudGrid>
+                            
+                            <MudDivider Class="my-3" />
+                            
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                <strong>Most Completed Prayer:</strong>
+                            </MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">
+                                @(Statistics.MostCompletedPrayer?.ToString() ?? "None")
+                            </MudText>
+                            
+                            <MudText Typo="Typo.body2" Class="mb-2">
+                                <strong>Least Completed Prayer:</strong>
+                            </MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @(Statistics.LeastCompletedPrayer?.ToString() ?? "None")
+                            </MudText>
+                        </MudCardContent>
+                    </MudCard>
+                }
+            </MudItem>
+        </MudGrid>
+        
+        @if (WeeklyTracking.Any())
+        {
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Weekly Progress</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        @foreach (var day in WeeklyTracking)
+                        {
+                            <MudItem xs="12" sm="6" md="4" lg="3">
+                                <MudPaper Class="pa-3 text-center">
+                                    <MudText Typo="Typo.h6">@day.Date.ToString("ddd")</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@day.Date.ToString("MMM dd")</MudText>
+                                    <MudProgressLinear 
+                                        Value="@day.CompletionPercentage" 
+                                        Color="@(day.CompletionPercentage >= 80 ? Color.Success : day.CompletionPercentage >= 50 ? Color.Warning : Color.Error)" 
+                                        Class="my-2" />
+                                    <MudText Typo="Typo.body2">@day.CompletedPrayers/@day.TotalPrayers</MudText>
+                                </MudPaper>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        }
+        
+        <MudCard Class="mt-4">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Prayer Tips</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudList T="string">
+                    <MudListItem T="string">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2" Class="ml-2">Set reminders for prayer times</MudText>
+                    </MudListItem>
+                    <MudListItem T="string">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2" Class="ml-2">Find a quiet place for prayer</MudText>
+                    </MudListItem>
+                    <MudListItem T="string">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2" Class="ml-2">Use the Qibla compass to face the right direction</MudText>
+                    </MudListItem>
+                    <MudListItem T="string">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2" Class="ml-2">Track your progress to stay motivated</MudText>
+                    </MudListItem>
+                    <MudListItem T="string">
+                        <MudIcon Icon="@Icons.Material.Filled.Lightbulb" Color="Color.Primary" Size="Size.Small" />
+                        <MudText Typo="Typo.body2" Class="ml-2">Pray with family and community when possible</MudText>
+                    </MudListItem>
+                </MudList>
+            </MudCardContent>
+        </MudCard>
+    }
+</MudContainer>
+
+@code {
+    private IList<PrayerModel> Prayers { get; set; } = new List<PrayerModel>();
+    private PrayerStatisticsModel? Statistics { get; set; }
+    private IList<PrayerTrackingModel> WeeklyTracking { get; set; } = new List<PrayerTrackingModel>();
+    private bool isLoading = true;
+    private bool _disposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing PrayerTracker page: {ex.Message}");
+        }
+        finally
+        {
+            if (!_disposed)
+            {
+                isLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            // Load prayers
+            var prayers = PrayerService.GetTodayPrayers();
+            var now = DateTime.Now;
+            
+            // Update prayer status
+            foreach (var prayer in prayers)
+            {
+                // Check if prayer is completed
+                var tracking = await PrayerTrackingService.GetPrayerTrackingAsync(DateTime.Today);
+                if (tracking != null)
+                {
+                    var status = tracking.GetPrayerStatus(prayer.PrayerName);
+                    prayer.IsCompleted = status.IsCompleted;
+                }
+                
+                // Check if prayer is current or next
+                var (nextPrayerName, nextPrayerTime) = PrayerService.GetNextPrayer();
+                var (currentPrayerName, _) = PrayerService.GetPrayerTimes(DateTime.Today).GetCurrentPrayer(now);
+                
+                prayer.IsNextPrayer = prayer.PrayerName == nextPrayerName;
+                prayer.IsCurrentPrayer = prayer.PrayerName == currentPrayerName;
+                
+                // Calculate time remaining for next prayer
+                if (prayer.IsNextPrayer && nextPrayerTime.HasValue)
+                {
+                    prayer.TimeRemaining = nextPrayerTime.Value - now;
+                }
+            }
+            
+            if (!_disposed)
+            {
+                Prayers = prayers;
+            }
+
+            // Load statistics
+            var today = DateTime.Today;
+            Statistics = await PrayerTrackingService.GetPrayerStatisticsAsync(today, today);
+            
+            // Load weekly tracking
+            var weekStart = today.AddDays(-(int)today.DayOfWeek);
+            WeeklyTracking = await PrayerTrackingService.GetPrayerTrackingRangeAsync(weekStart, today);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading prayer tracking data: {ex.Message}");
+        }
+    }
+
+    private async Task MarkPrayerCompleted(PrayerName prayerName)
+    {
+        if (_disposed) return;
+
+        try
+        {
+            await PrayerTrackingService.MarkPrayerCompletedAsync(prayerName, DateTime.Today);
+            if (!_disposed)
+            {
+                await LoadDataAsync();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error marking prayer completed: {ex.Message}");
+        }
+    }
+}

@@ -1,0 +1,247 @@
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Interfaces
+@using MudBlazor
+@inject IPrayerService PrayerService
+@inject IPrayerTrackingService PrayerTrackingService
+
+<MudCard Class="prayer-tracker-card">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Prayer Tracker</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">Track your daily prayers</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        @if (Prayers.Any())
+        {
+            <MudGrid>
+                @foreach (var prayer in Prayers)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudPaper Class="pa-3 prayer-item" Elevation="2">
+                            <div class="d-flex align-center justify-space-between">
+                                <div>
+                                    <MudText Typo="Typo.h6">@prayer.PrayerName</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@prayer.FormattedTime</MudText>
+                                </div>
+                                <div class="d-flex align-center">
+                                    @if (prayer.IsCompleted)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+                                        <MudText Typo="Typo.body2" Color="Color.Success" Class="ml-2">Completed</MudText>
+                                    }
+                                    else if (prayer.IsCurrentPrayer)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" />
+                                        <MudText Typo="Typo.body2" Color="Color.Primary" Class="ml-2">Current</MudText>
+                                    }
+                                    else if (prayer.IsNextPrayer)
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Upcoming" Color="Color.Warning" />
+                                        <MudText Typo="Typo.body2" Color="Color.Warning" Class="ml-2">Next</MudText>
+                                    }
+                                    else
+                                    {
+                                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Default" />
+                                        <MudText Typo="Typo.body2" Color="Color.Default" Class="ml-2">Pending</MudText>
+                                    }
+                                </div>
+                            </div>
+                            
+                            @if (!prayer.IsCompleted && (prayer.IsCurrentPrayer || DateTime.Now > prayer.PrayerTime))
+                            {
+                                <MudButton 
+                                    Variant="Variant.Filled" 
+                                    Color="Color.Primary" 
+                                    Size="Size.Small"
+                                    Class="mt-2"
+                                    OnClick="() => MarkPrayerCompleted(prayer.PrayerName)">
+                                    Mark as Completed
+                                </MudButton>
+                            }
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+            
+            @if (Statistics != null)
+            {
+                <MudDivider Class="my-4" />
+                <MudText Typo="Typo.h6" Class="mb-3">Today's Progress</MudText>
+                <MudGrid>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudPaper Class="pa-3 text-center">
+                            <MudText Typo="Typo.h4" Color="Color.Primary">@Statistics.CompletionPercentage:F0%</MudText>
+                            <MudText Typo="Typo.body2">Completion</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudPaper Class="pa-3 text-center">
+                            <MudText Typo="Typo.h4" Color="Color.Success">@Statistics.CurrentStreak</MudText>
+                            <MudText Typo="Typo.body2">Day Streak</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudPaper Class="pa-3 text-center">
+                            <MudText Typo="Typo.h4" Color="Color.Info">@Statistics.TotalCompleted</MudText>
+                            <MudText Typo="Typo.body2">Completed</MudText>
+                        </MudPaper>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudPaper Class="pa-3 text-center">
+                            <MudText Typo="Typo.h4" Color="Color.Warning">@Statistics.TotalPrayers</MudText>
+                            <MudText Typo="Typo.body2">Total</MudText>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            }
+        }
+        else
+        {
+            <MudText Typo="Typo.body1" Class="text-center">Loading prayers...</MudText>
+        }
+    </MudCardContent>
+</MudCard>
+
+@code {
+    private IList<PrayerModel> Prayers { get; set; } = new List<PrayerModel>();
+    private PrayerStatisticsModel? Statistics { get; set; }
+    private Timer? _timer;
+    private bool _disposed = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadPrayersAsync();
+            await LoadStatisticsAsync();
+            
+            // Update every minute - but only if component is still active
+            _timer = new Timer(async _ => 
+            {
+                if (!_disposed)
+                {
+                    try
+                    {
+                        await InvokeAsync(async () =>
+                        {
+                            if (!_disposed)
+                            {
+                                await LoadPrayersAsync();
+                                StateHasChanged();
+                            }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Timer callback error: {ex.Message}");
+                    }
+                }
+            }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing PrayerTracker: {ex.Message}");
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!_disposed)
+        {
+            try
+            {
+                await LoadPrayersAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OnParametersSetAsync: {ex.Message}");
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _timer?.Dispose();
+        _timer = null;
+    }
+
+    private async Task LoadPrayersAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            var prayers = PrayerService.GetTodayPrayers();
+            var now = DateTime.Now;
+            
+            // Update prayer status
+            foreach (var prayer in prayers)
+            {
+                // Check if prayer is completed
+                var tracking = await PrayerTrackingService.GetPrayerTrackingAsync(DateTime.Today);
+                if (tracking != null)
+                {
+                    var status = tracking.GetPrayerStatus(prayer.PrayerName);
+                    prayer.IsCompleted = status.IsCompleted;
+                }
+                
+                // Check if prayer is current or next
+                var (nextPrayerName, nextPrayerTime) = PrayerService.GetNextPrayer();
+                var (currentPrayerName, _) = PrayerService.GetPrayerTimes(DateTime.Today).GetCurrentPrayer(now);
+                
+                prayer.IsNextPrayer = prayer.PrayerName == nextPrayerName;
+                prayer.IsCurrentPrayer = prayer.PrayerName == currentPrayerName;
+                
+                // Calculate time remaining for next prayer
+                if (prayer.IsNextPrayer && nextPrayerTime.HasValue)
+                {
+                    prayer.TimeRemaining = nextPrayerTime.Value - now;
+                }
+            }
+            
+            if (!_disposed)
+            {
+                Prayers = prayers;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading prayers: {ex.Message}");
+        }
+    }
+
+    private async Task LoadStatisticsAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            var today = DateTime.Today;
+            Statistics = await PrayerTrackingService.GetPrayerStatisticsAsync(today, today);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading statistics: {ex.Message}");
+        }
+    }
+
+    private async Task MarkPrayerCompleted(PrayerName prayerName)
+    {
+        if (_disposed) return;
+
+        try
+        {
+            await PrayerTrackingService.MarkPrayerCompletedAsync(prayerName, DateTime.Today);
+            if (!_disposed)
+            {
+                await LoadPrayersAsync();
+                await LoadStatisticsAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error marking prayer completed: {ex.Message}");
+        }
+    }
+}

@@ -1,0 +1,88 @@
+@page "/tasbeeh"
+@using MudBlazor
+
+<PageTitle>Tasbeeh Counter - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Tasbeeh Counter</MudText>
+    
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Tasbeeh Counter</MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary">Digital Dhikr Counter</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <div class="text-center">
+                <MudText Typo="Typo.h3" Class="mb-2">سبحان الله</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-4">Glory be to Allah</MudText>
+                
+                <MudPaper Class="pa-6 mb-4" Elevation="3">
+                    <MudText Typo="Typo.h1" Color="Color.Primary">0</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">of 33</MudText>
+                </MudPaper>
+                
+                <MudProgressLinear Value="0" Color="Color.Primary" Class="mb-4" />
+                
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Filled" 
+                            Color="Color.Error" 
+                            Size="Size.Large"
+                            Disabled="true">
+                            <MudIcon Icon="@Icons.Material.Filled.Remove" />
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Filled" 
+                            Color="Color.Primary" 
+                            Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" />
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Outlined" 
+                            Color="Color.Secondary" 
+                            Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.Refresh" />
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+            </div>
+        </MudCardContent>
+    </MudCard>
+    
+    <MudCard Class="mt-4">
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Statistics</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudList T="string">
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">Today: 0</MudText>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">This Week: 0</MudText>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">This Month: 0</MudText>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">Total: 0</MudText>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">Current Streak: 0 days</MudText>
+                </MudListItem>
+                <MudListItem T="string">
+                    <MudText Typo="Typo.body1">Longest Streak: 0 days</MudText>
+                </MudListItem>
+            </MudList>
+        </MudCardContent>
+    </MudCard>
+</MudContainer>
+
+@code {
+    // Simple static page for now
+}

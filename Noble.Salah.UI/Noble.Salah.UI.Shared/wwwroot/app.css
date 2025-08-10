@@ -49,3 +49,126 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+/* Add error boundary styles */
+.error-boundary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    padding: 2rem;
+}
+
+.error-content {
+    text-align: center;
+    max-width: 500px;
+    padding: 2rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.error-content h3 {
+    color: #d32f2f;
+    margin-bottom: 1rem;
+}
+
+.error-content p {
+    margin-bottom: 1.5rem;
+    color: #666;
+}
+
+.error-content details {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.error-content pre {
+    background-color: #f5f5f5;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+.error-content button {
+    margin: 0 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.error-content .btn-primary {
+    background-color: #1976d2;
+    color: white;
+}
+
+.error-content .btn-secondary {
+    background-color: #757575;
+    color: white;
+}
+
+.error-content button:hover {
+    opacity: 0.9;
+}
+
+/* Loading styles */
+.loading-progress {
+    position: relative;
+    display: block;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke: #e0e0e0;
+}
+
+.loading-progress .loading-progress-indicator {
+    animation: loading-progress 1s infinite ease-in-out;
+}
+
+@keyframes loading-progress {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-progress-text {
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    inset: calc(20vh + 3.25rem) 0 auto 2rem;
+}
+
+.loading-progress-text:after {
+    content: var(--blazor-load-percentage-text, "Loading");
+}
+
+/* Blazor error UI */
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.5rem;
+}

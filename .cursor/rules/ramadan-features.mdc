@@ -1,0 +1,225 @@
+# Ramadan Features and Islamic Functionality Rules
+
+## Ramadan Mode Implementation
+
+### Theme System
+- Implement special Ramadan UI theme
+- Use Islamic color palette (purple, gold, green)
+- Support dark mode for night viewing
+- Include Ramadan-specific icons and graphics
+
+### Ramadan Calendar
+- Display 30-day Ramadan schedule
+- Show Sehri and Iftar times
+- Include prayer times for Ramadan
+- Support multiple time zones
+
+### Ramadan Notifications
+- Sehri reminder notifications
+- Iftar time notifications
+- Tarawih prayer reminders
+- Special Ramadan greetings
+
+## Islamic Content Guidelines
+
+### Quran Integration
+- Use accurate Quran text from reliable sources
+- Support multiple translations
+- Include audio recitations
+- Implement bookmarking system
+
+### Daily Duas
+- Categorized supplications
+- Include Arabic text and translations
+- Provide audio recitations
+- Support favorites and sharing
+
+### Islamic Calendar
+- Hijri/Gregorian date conversion
+- Important Islamic dates and events
+- Eid celebrations and holidays
+- Historical Islamic events
+
+## Prayer Features
+
+### Qibla Compass
+- Real-time direction calculation
+- Use device sensors (compass, GPS)
+- Handle magnetic declination
+- Provide accuracy indicators
+
+### Tasbeeh Counter
+- Digital counter with haptic feedback
+- Multiple counter types (33, 99, custom)
+- Track daily dhikr goals
+- Include preset dhikr phrases
+
+### Prayer Tracking
+- Log daily prayers
+- Track prayer statistics
+- Set prayer goals
+- Generate prayer reports
+
+## Community Features
+
+### Masjid Finder
+- GPS-based mosque locator
+- Include prayer times for mosques
+- Show mosque facilities
+- Support mosque reviews and ratings
+
+### Halal Finder
+- Restaurant and market finder
+- Halal certification indicators
+- User reviews and ratings
+- Distance and direction information
+
+### Islamic Events
+- Local Islamic events calendar
+- Event registration and reminders
+- Community announcements
+- Islamic education programs
+
+## Cultural Sensitivity
+
+### Language Support
+- Arabic text support with proper fonts
+- RTL (Right-to-Left) layout support
+- Multiple language translations
+- Cultural context in translations
+
+### Religious Accuracy
+- Consult with Islamic scholars
+- Use authentic sources for content
+- Respect different schools of thought
+- Include disclaimers where appropriate
+
+### User Preferences
+- Allow users to choose calculation methods
+- Support different schools of thought
+- Respect cultural differences
+- Provide customization options
+
+## Content Management
+
+### Islamic Content Sources
+- Use reliable Islamic websites and APIs
+- Verify content accuracy
+- Include source attribution
+- Regular content updates
+
+### User-Generated Content
+- Moderate community content
+- Respect Islamic guidelines
+- Include reporting mechanisms
+- Maintain community standards
+
+### Content Caching
+- Cache Islamic content for offline access
+- Regular content synchronization
+- Handle content updates gracefully
+- Optimize content delivery
+
+## Technical Implementation
+
+### Prayer Calculation Integration
+- Integrate with existing prayer service
+- Support Ramadan-specific calculations
+- Handle time zone changes during Ramadan
+- Provide accurate fasting times
+
+### Notification System
+- Platform-specific notification implementation
+- Customizable notification preferences
+- Support for Adhan audio
+- Quiet hours and do-not-disturb support
+
+### Offline Support
+- Cache essential Islamic content
+- Offline prayer calculations
+- Downloadable Quran and Duas
+- Sync when online
+
+## Accessibility for Islamic Users
+
+### Visual Accessibility
+- High contrast themes for older users
+- Large text support for Quran reading
+- Color-blind friendly themes
+- Clear prayer time displays
+
+### Audio Accessibility
+- High-quality Adhan recordings
+- Adjustable audio levels
+- Support for hearing aids
+- Audio descriptions for visual content
+
+### Cultural Accessibility
+- Respect for prayer times and spaces
+- Support for different Islamic traditions
+- Inclusive language and imagery
+- Cultural sensitivity in design
+
+## Performance and Reliability
+
+### Content Delivery
+- Fast loading of Islamic content
+- Optimized image and audio delivery
+- CDN distribution for global access
+- Efficient caching strategies
+
+### Data Accuracy
+- Regular prayer time verification
+- Accurate Islamic date calculations
+- Reliable content sources
+- Error handling for missing data
+
+### User Experience
+- Intuitive navigation for Islamic features
+- Consistent design language
+- Fast response times
+- Reliable notifications
+
+## Testing Islamic Features
+
+### Prayer Accuracy Testing
+- Compare with local mosque times
+- Test different calculation methods
+- Verify timezone handling
+- Test edge cases (polar regions)
+
+### Content Testing
+- Verify Islamic content accuracy
+- Test multilingual support
+- Validate RTL layout
+- Test accessibility features
+
+### Cultural Testing
+- Test with diverse Muslim communities
+- Validate cultural sensitivity
+- Test different Islamic traditions
+- Gather community feedback
+
+## Documentation and Support
+
+### Islamic Content Documentation
+- Document content sources
+- Include Islamic references
+- Provide usage guidelines
+- Maintain content accuracy
+
+### User Support
+- Islamic community support
+- Multilingual support
+- Cultural sensitivity training
+- Community feedback channels
+
+### Continuous Improvement
+- Regular community feedback
+- Islamic scholar consultation
+- Content accuracy reviews
+- Feature enhancement based on usage
+description:
+globs:
+alwaysApply: false
+---

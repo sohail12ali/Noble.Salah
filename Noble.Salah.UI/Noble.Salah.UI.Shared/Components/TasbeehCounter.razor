@@ -1,0 +1,284 @@
+@using Noble.Salah.Common.Models
+@using Noble.Salah.Common.Enums
+@using Noble.Salah.Common.Interfaces
+@using MudBlazor
+@using MudBlazor.Components
+@inject ITasbeehService TasbeehService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<MudCard Class="tasbeeh-counter-card">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Tasbeeh Counter</MudText>
+        <MudText Typo="Typo.body2" Color="Color.Secondary">Digital Dhikr Counter</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        @if (CurrentTasbeeh != null)
+        {
+            <div class="text-center">
+                <MudText Typo="Typo.h3" Class="mb-2">@CurrentTasbeeh.DisplayText</MudText>
+                <MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-4">@CurrentTasbeeh.EnglishTranslation</MudText>
+                
+                <MudPaper Class="pa-6 mb-4" Elevation="3">
+                    <MudText Typo="Typo.h1" Color="Color.Primary">@CurrentTasbeeh.Count</MudText>
+                    <MudText Typo="Typo.body1" Color="Color.Secondary">of @CurrentTasbeeh.Target</MudText>
+                </MudPaper>
+                
+                <MudProgressLinear 
+                    Value="@CurrentTasbeeh.ProgressPercentage" 
+                    Color="Color.Primary" 
+                    Class="mb-4" />
+                
+                <MudGrid>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Filled" 
+                            Color="Color.Error" 
+                            Size="Size.Large"
+                            OnClick="DecrementTasbeeh"
+                            Disabled="@(CurrentTasbeeh.Count <= 0)">
+                            <MudIcon Icon="@Icons.Material.Filled.Remove" />
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Filled" 
+                            Color="Color.Primary" 
+                            Size="Size.Large"
+                            OnClick="IncrementTasbeeh"
+                            Disabled="@CurrentTasbeeh.IsCompleted">
+                            <MudIcon Icon="@Icons.Material.Filled.Add" />
+                        </MudButton>
+                    </MudItem>
+                    <MudItem xs="4">
+                        <MudButton 
+                            Variant="Variant.Outlined" 
+                            Color="Color.Secondary" 
+                            Size="Size.Large"
+                            OnClick="ResetTasbeeh">
+                            <MudIcon Icon="@Icons.Material.Filled.Refresh" />
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
+                
+                @if (CurrentTasbeeh.IsCompleted)
+                {
+                    <MudAlert Severity="Severity.Success" Class="mt-4">
+                        <MudText Typo="Typo.h6">Tasbeeh Completed! 🎉</MudText>
+                        <MudText Typo="Typo.body2">May Allah accept your dhikr</MudText>
+                    </MudAlert>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <MudText Typo="Typo.h6" Class="mb-4">Start a new Tasbeeh</MudText>
+                <MudButton 
+                    Variant="Variant.Filled" 
+                    Color="Color.Primary" 
+                    Size="Size.Large"
+                    OnClick="OpenPresetDialog">
+                    Choose Preset
+                </MudButton>
+            </div>
+        }
+    </MudCardContent>
+</MudCard>
+
+<MudDialog @bind-IsVisible="ShowPresetDialog" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">Choose Tasbeeh Preset</MudText>
+    </TitleContent>
+    <DialogContent>
+        @if (Presets.Any())
+        {
+            <MudGrid>
+                @foreach (var preset in Presets)
+                {
+                    <MudItem xs="12" sm="6">
+                        <MudPaper Class="pa-3 preset-item" Elevation="1" Style="cursor: pointer;" @onclick="() => SelectPreset(preset)">
+                            <MudText Typo="Typo.h6">@preset.Name</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@preset.Description</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Primary">Target: @preset.Target</MudText>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        }
+        else
+        {
+            <MudText Typo="Typo.body1" Class="text-center">Loading presets...</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="ClosePresetDialog">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private TasbeehModel? CurrentTasbeeh { get; set; }
+    private IList<TasbeehPreset> Presets { get; set; } = new List<TasbeehPreset>();
+    private bool ShowPresetDialog { get; set; }
+    private bool _disposed = false;
+    
+    private DialogOptions dialogOptions = new()
+    {
+        MaxWidth = MaxWidth.Medium,
+        FullWidth = true
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await LoadCurrentTasbeehAsync();
+            await LoadPresetsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing TasbeehCounter: {ex.Message}");
+        }
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+    }
+
+    private async Task LoadCurrentTasbeehAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            CurrentTasbeeh = await TasbeehService.GetCurrentTasbeehAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading current Tasbeeh: {ex.Message}");
+        }
+    }
+
+    private async Task LoadPresetsAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            Presets = await TasbeehService.GetTasbeehPresetsAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading presets: {ex.Message}");
+        }
+    }
+
+    private async Task IncrementTasbeeh()
+    {
+        if (CurrentTasbeeh == null || _disposed) return;
+
+        try
+        {
+            CurrentTasbeeh = await TasbeehService.IncrementTasbeehAsync(CurrentTasbeeh.Id);
+            
+            // Haptic feedback (if supported)
+            await TriggerHapticFeedbackAsync();
+            
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error incrementing Tasbeeh: {ex.Message}");
+        }
+    }
+
+    private async Task DecrementTasbeeh()
+    {
+        if (CurrentTasbeeh == null || _disposed) return;
+
+        try
+        {
+            CurrentTasbeeh = await TasbeehService.DecrementTasbeehAsync(CurrentTasbeeh.Id);
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error decrementing Tasbeeh: {ex.Message}");
+        }
+    }
+
+    private async Task ResetTasbeeh()
+    {
+        if (CurrentTasbeeh == null || _disposed) return;
+
+        try
+        {
+            CurrentTasbeeh = await TasbeehService.ResetTasbeehAsync(CurrentTasbeeh.Id);
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error resetting Tasbeeh: {ex.Message}");
+        }
+    }
+
+    private async Task SelectPreset(TasbeehPreset preset)
+    {
+        if (_disposed) return;
+
+        try
+        {
+            CurrentTasbeeh = await TasbeehService.CreateTasbeehAsync(preset.Type, preset.Target);
+            ShowPresetDialog = false;
+            if (!_disposed)
+            {
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating Tasbeeh: {ex.Message}");
+        }
+    }
+
+    private void OpenPresetDialog()
+    {
+        if (!_disposed)
+        {
+            ShowPresetDialog = true;
+        }
+    }
+
+    private void ClosePresetDialog()
+    {
+        if (!_disposed)
+        {
+            ShowPresetDialog = false;
+        }
+    }
+
+    private async Task TriggerHapticFeedbackAsync()
+    {
+        if (_disposed) return;
+
+        try
+        {
+            // Try to trigger haptic feedback if supported by the platform
+            await JSRuntime.InvokeVoidAsync("navigator.vibrate", 50);
+        }
+        catch
+        {
+            // Haptic feedback not supported, ignore
+        }
+    }
+}

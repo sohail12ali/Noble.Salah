@@ -8,6 +8,7 @@
 @inject IPrayerService PrayerService
 @inject ILocationService LocationService
 @inject ILocalStorage LocalStorage
+@inject NavigationManager NavigationManager
 
 <PageTitle>Noble Salah 📿</PageTitle>
 <body>
@@ -53,6 +54,49 @@
                 </MudCardHeader>
             </MudCard>
         }
+        
+        <!-- Quick Access Features -->
+        <MudGrid>
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Class="feature-card" Style="cursor: pointer;" @onclick="() => NavigateToPrayerTracker()">
+                    <MudCardContent Class="text-center pa-4">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Primary" Size="Size.Large" />
+                        <MudText Typo="Typo.h6" Class="mt-2">Prayer Tracker</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Track your daily prayers</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Class="feature-card" Style="cursor: pointer;" @onclick="() => NavigateToTasbeeh()">
+                    <MudCardContent Class="text-center pa-4">
+                        <MudIcon Icon="@Icons.Material.Filled.TouchApp" Color="Color.Secondary" Size="Size.Large" />
+                        <MudText Typo="Typo.h6" Class="mt-2">Tasbeeh</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Digital dhikr counter</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Class="feature-card" Style="cursor: pointer;" @onclick="() => NavigateToQibla()">
+                    <MudCardContent Class="text-center pa-4">
+                        <MudIcon Icon="@Icons.Material.Filled.Explore" Color="Color.Info" Size="Size.Large" />
+                        <MudText Typo="Typo.h6" Class="mt-2">Qibla Compass</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Find prayer direction</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            
+            <MudItem xs="12" sm="6" md="3">
+                <MudCard Class="feature-card" Style="cursor: pointer;" @onclick="() => NavigateToCalendar()">
+                    <MudCardContent Class="text-center pa-4">
+                        <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Color="Color.Warning" Size="Size.Large" />
+                        <MudText Typo="Typo.h6" Class="mt-2">Calendar</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">Prayer schedules</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
     }
 
 </body>
@@ -72,8 +116,22 @@
     {
         if (firstRender)
         {
-            await LoadWithCachedLocationAsync();
+            try
+            {
+                await LoadWithCachedLocationAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in OnAfterRenderAsync: {ex.Message}");
+                isLoading = false;
+                StateHasChanged();
+            }
         }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 
     private async Task LoadWithCachedLocationAsync()
@@ -103,8 +161,18 @@
                 PrayerService.UpdateConfigs(latitude, longitude, cachedTz ?? "UTC");
                 await LoadPrayerTimesAsync();
 
-                // Update location in background
-                _ = Task.Run(async () => await UpdateLocationInBackgroundAsync());
+                // Update location in background without blocking
+                _ = Task.Run(async () => 
+                {
+                    try
+                    {
+                        await UpdateLocationInBackgroundAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Background location update failed: {ex.Message}");
+                    }
+                });
             }
             else
             {
@@ -145,11 +213,24 @@
                 PrayerService.UpdateConfigs(latitude, longitude, tz);
                 await LoadPrayerTimesAsync();
             }
+            else
+            {
+                // Use default location if geolocation fails
+                latitude = 0;
+                longitude = 0;
+                PrayerService.UpdateConfigs(latitude, longitude, tz);
+                await LoadPrayerTimesAsync();
+            }
         }
         catch (Exception ex)
         {
             // Log error or show user-friendly message
             Console.WriteLine($"Error detecting location: {ex.Message}");
+            // Use default values
+            latitude = 0;
+            longitude = 0;
+            PrayerService.UpdateConfigs(latitude, longitude, "UTC");
+            await LoadPrayerTimesAsync();
         }
     }
 
@@ -186,22 +267,29 @@
 
     private async Task LoadPrayerTimesAsync()
     {
-        prayers = PrayerService.GetTodayPrayers();
-        var (name, time) = PrayerService.GetNextPrayer();
-        if (time is null || name is null)
+        try
         {
-            var prayer = prayers.Last();
-            name = prayer.PrayerName;
-            time = prayer.PrayerTime;
+            prayers = PrayerService.GetTodayPrayers();
+            var (name, time) = PrayerService.GetNextPrayer();
+            if (time is null || name is null)
+            {
+                var prayer = prayers.Last();
+                name = prayer.PrayerName;
+                time = prayer.PrayerTime;
+            }
+
+            nextPrayerName = name;
+            nextPrayerTime = time;
+
+            // Determine current prayer
+            currentPrayerName = DetermineCurrentPrayer();
+
+            await StartCountdownTimer();
         }
-
-        nextPrayerName = name;
-        nextPrayerTime = time;
-
-        // Determine current prayer
-        currentPrayerName = DetermineCurrentPrayer();
-
-        await StartCountdownTimer();
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading prayer times: {ex.Message}");
+        }
     }
 
     private PrayerName? DetermineCurrentPrayer()
@@ -241,15 +329,29 @@
 
     private Task StartCountdownTimer()
     {
-        timer?.Dispose();
-        timer = new System.Timers.Timer(1000);
-        timer.Elapsed += async (s, e) =>
+        try
         {
-            UpdateRemainingTime();
-            UpdateCurrentPrayer();
-            await InvokeAsync(StateHasChanged);
-        };
-        timer.Start();
+            timer?.Dispose();
+            timer = new System.Timers.Timer(1000);
+            timer.Elapsed += async (s, e) =>
+            {
+                try
+                {
+                    UpdateRemainingTime();
+                    UpdateCurrentPrayer();
+                    await InvokeAsync(StateHasChanged);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in timer callback: {ex.Message}");
+                }
+            };
+            timer.Start();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting countdown timer: {ex.Message}");
+        }
         return Task.CompletedTask;
     }
 
@@ -287,6 +389,55 @@
         catch
         {
             return "00:00:00";
+        }
+    }
+
+    // Navigation methods
+    private void NavigateToPrayerTracker()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("/prayer-tracker");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Navigation error: {ex.Message}");
+        }
+    }
+
+    private void NavigateToTasbeeh()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("/tasbeeh");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Navigation error: {ex.Message}");
+        }
+    }
+
+    private void NavigateToQibla()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("/qibla");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Navigation error: {ex.Message}");
+        }
+    }
+
+    private void NavigateToCalendar()
+    {
+        try
+        {
+            NavigationManager.NavigateTo("/calendar");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Navigation error: {ex.Message}");
         }
     }
 }

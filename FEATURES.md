@@ -158,8 +158,8 @@ Legend: ✅ Implemented | 🚧 Planned/In Progress
 ## 🛠 Current Tech Stack
 
 - **Frontend:** 
-  - Blazor WASM for Web (.NET 8.0)
-  - .NET MAUI for Mobile/Desktop (.NET 8.0)
+  - Blazor WASM for Web (.NET 9.0)
+  - .NET MAUI for Mobile/Desktop (.NET 9.0)
   - Shared UI components between platforms
 - **Core Libraries:**
   - Batoulapps.Adhan for prayer calculations

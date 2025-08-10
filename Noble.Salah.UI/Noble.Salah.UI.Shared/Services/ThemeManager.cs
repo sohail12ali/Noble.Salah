@@ -20,7 +20,15 @@ public class ThemeManager
     {
         _localStorage = localStorage;
         Theme = GetDefaultTheme();
-        _ = LoadThemeFromStorageAsync();
+        // Remove async call from constructor to avoid issues
+    }
+
+    /// <summary>
+    /// Initializes the theme manager asynchronously
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        await LoadThemeFromStorageAsync();
     }
 
     public MudTheme GetTheme(AppTheme appTheme)

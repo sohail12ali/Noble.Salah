@@ -11,6 +11,8 @@ internal static class RegisterServices
         services
             .AddSingleton<IFormFactor, FormFactor>()
             .AddSingleton<IPrayerService, PrayerService>()
+            .AddSingleton<IPrayerTrackingService, PrayerTrackingService>()
+            .AddSingleton<ITasbeehService, TasbeehService>()
             .AddSingleton<ILocalStorage, BrowserLocalStorage>()
             .AddSingleton<ILocationService, BrowserLocationService>()
             .AddSharedDependencyServices();

@@ -52,9 +52,23 @@
     {
         if (firstRender)
         {
-            // Use the last selected theme (persisted in ThemeManager)
-            await SetTheme(_themeManager.CurrentTheme);
-            StateHasChanged();
+            try
+            {
+                // Initialize theme manager asynchronously with proper error handling
+                await _themeManager.InitializeAsync();
+                
+                // Use the last selected theme (persisted in ThemeManager)
+                await SetTheme(_themeManager.CurrentTheme);
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't crash the application
+                Console.WriteLine($"Error initializing theme: {ex.Message}");
+                // Set default theme as fallback
+                await SetTheme(AppTheme.System);
+                StateHasChanged();
+            }
         }
     }
 
@@ -65,34 +79,42 @@
 
     async Task SetTheme(AppTheme themeType)
     {
-        _currentTheme = themeType;
-        
-        // Apply the theme using ThemeManager
-        _themeManager.ApplyTheme(themeType);
-
-        // Set dark mode based on theme type
-        _isDarkMode = themeType switch
+        try
         {
-            AppTheme.System => _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false,
-            AppTheme.DarkDefault => true,
-            AppTheme.OceanBreeze => true,
-            AppTheme.DesertSunset => true,
-            AppTheme.NightSky => true,
-            AppTheme.MorningDew => true,
-            AppTheme.GoldenMosque => true,
-            AppTheme.RoyalPurple => true,
-            AppTheme.SerenityBlue => true,
-            AppTheme.ForestHarmony => true,
-            _ => false
-        };
+            _currentTheme = themeType;
+            
+            // Apply the theme using ThemeManager
+            _themeManager.ApplyTheme(themeType);
 
-        // Update theme icon based on the current theme
-        _themeIcon = themeType switch
+            // Set dark mode based on theme type
+            _isDarkMode = themeType switch
+            {
+                AppTheme.System => _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false,
+                AppTheme.DarkDefault => true,
+                AppTheme.OceanBreeze => true,
+                AppTheme.DesertSunset => true,
+                AppTheme.NightSky => true,
+                AppTheme.MorningDew => true,
+                AppTheme.GoldenMosque => true,
+                AppTheme.RoyalPurple => true,
+                AppTheme.SerenityBlue => true,
+                AppTheme.ForestHarmony => true,
+                _ => false
+            };
+
+            // Update theme icon based on the current theme
+            _themeIcon = themeType switch
+            {
+                AppTheme.System => Icons.Material.Filled.SettingsSuggest,
+                AppTheme.LightDefault => Icons.Material.Filled.LightMode,
+                AppTheme.DarkDefault => Icons.Material.Filled.DarkMode,
+                _ => Icons.Material.Filled.Palette
+            };
+        }
+        catch (Exception ex)
         {
-            AppTheme.System => Icons.Material.Filled.SettingsSuggest,
-            AppTheme.LightDefault => Icons.Material.Filled.LightMode,
-            AppTheme.DarkDefault => Icons.Material.Filled.DarkMode,
-            _ => Icons.Material.Filled.Palette
-        };
+            // Log error but don't crash the application
+            Console.WriteLine($"Error setting theme: {ex.Message}");
+        }
     }
 }

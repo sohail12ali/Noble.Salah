@@ -1,0 +1,96 @@
+@page "/qibla"
+@using Noble.Salah.Common.Interfaces
+@using MudBlazor
+@using MudBlazor.Components
+@using Noble.Salah.UI.Shared.Components
+
+<PageTitle>Qibla Compass - Noble Salah</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudText Typo="Typo.h4" Class="mb-4">Qibla Compass</MudText>
+    
+    <MudGrid>
+        <MudItem xs="12" md="8">
+            <QiblaCompass />
+        </MudItem>
+        
+        <MudItem xs="12" md="4">
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">About Qibla</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Class="mb-3">
+                        The Qibla is the direction towards the Kaaba in Mecca, Saudi Arabia. 
+                        Muslims face this direction during their daily prayers.
+                    </MudText>
+                    
+                    <MudDivider Class="my-3" />
+                    
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        <strong>Kaaba Location:</strong>
+                    </MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-3">
+                        Mecca, Saudi Arabia<br />
+                        Latitude: 21.4225°N<br />
+                        Longitude: 39.8262°E
+                    </MudText>
+                    
+                    <MudDivider Class="my-3" />
+                    
+                    <MudText Typo="Typo.body2" Class="mb-2">
+                        <strong>How to use:</strong>
+                    </MudText>
+                    <MudList T="string" Dense="true">
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">1. Allow location access</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">2. Hold your device flat</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">3. Rotate until the needle points to the arrow</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudText Typo="Typo.body2">4. Face the direction shown</MudText>
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+            
+            <MudCard Class="mt-4">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Prayer Times</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Class="mb-3">
+                        Use the Qibla direction for all your daily prayers:
+                    </MudText>
+                    
+                    <MudList T="string" Dense="true">
+                        <MudListItem T="string">
+                            <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="ml-2">Fajr (Dawn)</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="ml-2">Dhuhr (Noon)</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="ml-2">Asr (Afternoon)</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="ml-2">Maghrib (Sunset)</MudText>
+                        </MudListItem>
+                        <MudListItem T="string">
+                            <MudIcon Icon="@Icons.Material.Filled.Schedule" Color="Color.Primary" Size="Size.Small" />
+                            <MudText Typo="Typo.body2" Class="ml-2">Isha (Night)</MudText>
+                        </MudListItem>
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</MudContainer>

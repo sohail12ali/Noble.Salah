@@ -6,15 +6,37 @@ using Noble.Salah.Common.Interfaces;
 using Noble.Salah.UI.Web.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+// Add error handling and logging
+builder.Logging.SetMinimumLevel(LogLevel.Information);
+
 builder.RootComponents.Add<Noble.Salah.UI.Shared.Routes>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-builder.Services.AddMudServices();
-builder.Services.AddMudExtensions();
 
-builder.Services.AddDependencyServices();
+// Add services with error handling
+try
+{
+    builder.Services.AddMudServices();
+    builder.Services.AddMudExtensions();
+    builder.Services.AddDependencyServices();
+    builder.Services.AddSingleton<IFormFactor, FormFactor>();
+    builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error configuring services: {ex.Message}");
+    throw;
+}
 
-builder.Services.AddSingleton<IFormFactor, FormFactor>();
+var host = builder.Build();
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
-await builder.Build().RunAsync();
+// Initialize services with error handling
+try
+{
+    await host.RunAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error starting application: {ex.Message}");
+    throw;
+}
