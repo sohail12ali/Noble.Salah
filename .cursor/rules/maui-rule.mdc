@@ -1,0 +1,138 @@
+# Noble.Salah MAUI Development Rules
+
+## Project Architecture
+
+### Project Structure
+- **Noble.Salah.UI**: MAUI Blazor application (desktop/mobile)
+- **Noble.Salah.UI.Web**: Blazor WebAssembly (web version)
+- **Noble.Salah.UI.Shared**: Common UI components
+- **Noble.Salah.Common**: Core interfaces and models
+- **Noble.Salah.Integration**: Core services and external integrations
+- **Noble.Salah.AppHost**: .NET Aspire host
+- **Noble.Salah.ServiceDefaults**: Shared configurations
+
+### Key Patterns
+
+1. **Service Architecture**
+   - Define interfaces in `Noble.Salah.Common/Interfaces`
+   - Implement core logic in `Noble.Salah.Integration/Services`
+   - Platform-specific implementations in respective UI projects
+   - Use dependency injection for service registration
+
+2. **UI Component Structure**
+   - Shared components in `Noble.Salah.UI.Shared/Components`
+   - Use MudBlazor Material Design components
+   - Handle state changes via parameters and events
+   - Follow responsive design principles
+
+3. **Data Flow**
+   - Prayer calculations: Batoulapps.Adhan library → PrayerService → UI
+   - Location: Platform GPS/Browser → LocationService → PrayerService
+   - Settings: LocalStorage → Service configuration
+
+## Development Guidelines
+
+### Code Organization
+- Services: Singleton for global state (prayers, location)
+- Components: Parameters for data, events for actions
+- Models: Immutable where possible, validate in constructors
+- Use enums for prayer names, calculation methods
+
+### State Management
+- Cache location data with expiry (1 hour)
+- Persist settings in local storage
+- Update prayer times on location/settings change
+- Use timers for countdown updates
+
+### Cross-Platform Development
+- Use `IFormFactor` for platform-specific behavior
+- Implement platform services in respective UI projects
+- Test on all target platforms
+- Consider PWA capabilities for web version
+
+## MudBlazor Usage
+
+### Component Guidelines
+- Use MudBlazor components for consistent Material Design
+- Follow MudBlazor naming conventions
+- Implement responsive design with MudGrid
+- Use MudTheme for theming support
+
+### Theme System
+- Support light/dark mode switching
+- Use predefined themes from ThemeManager
+- Implement RTL support for Arabic/Urdu
+- Ensure accessibility compliance
+
+## Prayer Time Implementation
+
+### Calculation Engine
+- Use Batoulapps.Adhan library for accurate calculations
+- Support multiple calculation methods (Muslim World League, Egyptian, etc.)
+- Handle timezone conversions properly
+- Implement validation for prayer times
+
+### Location Services
+- Handle location permissions appropriately
+- Implement fallback mechanisms
+- Cache location data when appropriate
+- Handle location updates efficiently
+
+## Testing Requirements
+
+### Unit Testing
+- Write tests for all business logic
+- Follow AAA pattern (Arrange, Act, Assert)
+- Use meaningful test names
+- Mock external dependencies
+
+### Integration Testing
+- Test component integration
+- Verify prayer calculation accuracy
+- Test cross-platform functionality
+- Verify location services
+
+## Performance Guidelines
+
+### Component Optimization
+- Use `@key` directive for lists
+- Implement `ShouldRender()`
+- Avoid unnecessary renders
+- Dispose of timers and subscriptions
+
+### Resource Management
+- Cache heavy computations
+- Lazy load components when possible
+- Optimize image loading
+- Implement proper error handling
+
+## Accessibility
+
+### Requirements
+- WCAG 2.1 AA compliance
+- Screen reader support
+- High contrast mode
+- Keyboard navigation
+- Font size adjustment
+
+### Implementation
+- Use ARIA attributes appropriately
+- Support keyboard navigation
+- Ensure color contrast compliance
+- Test with screen readers
+
+## Documentation
+
+### Code Documentation
+- Write doc comments for each function
+- Document complex business logic
+- Include usage examples
+- Maintain API documentation
+
+### Architecture Documentation
+- Keep architecture decisions documented
+- Update implementation status
+- Document integration points
+- Maintain deployment guides
+alwaysApply: false
+---

@@ -1,0 +1,129 @@
+# Prayer Calculation Rules
+
+## Adhan Library Integration
+
+### Core Requirements
+- Use Batoulapps.Adhan library for all prayer calculations
+- Support multiple calculation methods (Muslim World League, Egyptian, Karachi, etc.)
+- Handle timezone conversions properly
+- Implement validation for prayer times
+
+### Calculation Methods
+- Support all major calculation methods defined in `CalculationMethodBy` enum
+- Implement proper validation for each method
+- Handle edge cases (polar regions, extreme latitudes)
+- Cache calculation results when appropriate
+
+### Timezone Handling
+- Use proper timezone conversion for user location
+- Handle daylight saving time transitions
+- Validate timezone IDs before calculations
+- Provide fallback for invalid timezones
+
+## Location Services
+
+### Permission Handling
+- Request location permissions appropriately
+- Provide clear permission rationale
+- Handle permission denial gracefully
+- Implement manual location selection
+
+### Fallback Mechanisms
+- Use IP-based geolocation as fallback
+- Cache last known location
+- Provide location accuracy indicators
+- Handle location service failures
+
+### Data Caching
+- Cache location data with 1-hour expiry
+- Store location in local storage
+- Update cache on location changes
+- Handle cache invalidation
+
+## Data Models
+
+### PrayerModel Structure
+- Follow established `PrayerModel` structure
+- Implement proper validation in constructors
+- Use appropriate data types (DateTime for times)
+- Handle null values appropriately
+
+### PrayerTimesModel
+- Include all prayer times for a day
+- Support date-specific calculations
+- Include metadata (calculation method, location)
+- Provide formatted time strings
+
+## Service Implementation
+
+### IPrayerService Interface
+- Implement all interface methods
+- Handle errors gracefully
+- Provide meaningful error messages
+- Log calculation events
+
+### Configuration Updates
+- Support dynamic configuration changes
+- Validate input parameters
+- Update calculations immediately
+- Notify UI of changes
+
+## Validation Requirements
+
+### Input Validation
+- Validate latitude (-90 to 90)
+- Validate longitude (-180 to 180)
+- Validate timezone ID format
+- Check calculation method enum values
+
+### Output Validation
+- Ensure prayer times are in chronological order
+- Validate time ranges (within 24-hour period)
+- Check for reasonable time differences
+- Handle edge cases (midnight prayers)
+
+## Performance Optimization
+
+### Calculation Caching
+- Cache results for same date/location
+- Implement cache invalidation strategy
+- Use memory-efficient caching
+- Monitor cache hit rates
+
+### Batch Calculations
+- Calculate multiple days efficiently
+- Use background processing for bulk operations
+- Implement progress reporting
+- Handle cancellation gracefully
+
+## Error Handling
+
+### Calculation Errors
+- Handle invalid coordinates
+- Manage timezone conversion errors
+- Provide fallback calculations
+- Log detailed error information
+
+### Service Errors
+- Implement retry mechanisms
+- Provide user-friendly error messages
+- Handle network connectivity issues
+- Maintain service availability
+
+## Testing Requirements
+
+### Unit Tests
+- Test all calculation methods
+- Validate edge cases
+- Test timezone conversions
+- Verify error handling
+
+### Integration Tests
+- Test with real location data
+- Verify calculation accuracy
+- Test performance under load
+- Validate caching behavior
+description:
+globs:
+alwaysApply: false
+---
