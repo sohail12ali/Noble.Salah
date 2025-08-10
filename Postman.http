@@ -13,12 +13,14 @@ Content-Type: application/json
   ]
 }
 
+### LM Studio Models List
+GET http://localhost:1234/v1/models
+
+
 ### LM Studio Chat Request
 POST http://localhost:1234/v1/chat/completions
 Content-Type: application/json
 {
-  -     "model": "gpt-4o-mini",
-  +     "model": "use the model identifier from LM Studio here",
-  "messages": [{"role": "user", "content": "Say this is a test!"}],
-  "temperature": 0.7
+  "model": "qwen/qwen3-coder-30b",
+  "messages": [{"role": "user", "content": "Say this is a test!"}]
 }

@@ -63,7 +63,7 @@
              DelimiterIcon="@Icons.Material.Filled.Circle"
              PreventTimerRestart="true"
              @bind-SelectedIndex="activeSlideIndex"
-             Style="@($"height:{Height};")">
+             Style="@($"height:{Height}; border-radius:20px;")">
     @foreach (var prayer in Prayers)
     {
         <MudCarouselItem>
@@ -71,12 +71,12 @@
                       Style="@GetPrayerCardStyle(prayer)">
                 <div style="position:absolute; inset:0; background-color:rgba(0,0,0,0.3);"></div>
                 <div style="@GetPrayerTextStyle(prayer)">
-                    <MudText Typo="Typo.h1">@prayer.PrayerName</MudText>
-                    <MudText Typo="Typo.h2">@prayer.PrayerTime.ToShortTimeString()</MudText>
+                    <MudText Typo="Typo.h3">@prayer.PrayerName</MudText>
+                    <MudText Typo="Typo.h5">@prayer.PrayerTime.ToShortTimeString()</MudText>
                     @if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
                     {
                         <MudChip T="string" Color="Color.Success" Size="Size.Small" Class="mt-2">
-                            🕐 Current Prayer
+                            🕐
                         </MudChip>
                     }
                 </div>
@@ -147,7 +147,7 @@
         if (CurrentPrayerName.HasValue && prayer.PrayerName == CurrentPrayerName.Value)
         {
             // Add a special border or glow for current prayer
-            return baseStyle + " border: 3px solid #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);";
+            return baseStyle + " border: 0px solid #4CAF50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.6);";
         }
         
         return baseStyle;

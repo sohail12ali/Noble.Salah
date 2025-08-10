@@ -1,82 +1,97 @@
-﻿@inherits LayoutComponentBase
+﻿@using Noble.Salah.UI.Shared.Services
+@using Noble.Salah.Common.Enums
+@inject ThemeManager _themeManager
+@inherits LayoutComponentBase
 
 <MudRTLProvider RightToLeft="@_rightToLeft">
+    <MudThemeProvider @ref="_mudThemeProvider" Theme="_themeManager.Theme" @bind-IsDarkMode="_isDarkMode" DefaultScrollbar="true" />
+    <MudPopoverProvider />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
 
-	<MudThemeProvider @ref="_mudThemeProvider" Theme="_themeManager.Theme" @bind-IsDarkMode="_isDarkMode" DefaultScrollbar="true" />
-	<MudPopoverProvider />
-	<MudDialogProvider />
-	<MudSnackbarProvider />
-
-	<MudLayout>
-		<MudAppBar>
-			<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-			Noble Salah
-			<MudSpacer />
-			<MudIconButton Icon="@_themeIcon" Color="Color.Inherit" Edge="Edge.End" OnClick="ToggleTheme" />
-		</MudAppBar>
-		<MudDrawer @bind-Open="@_drawerOpen">
-			<NavMenu />
-		</MudDrawer>
-		<MudMainContent>
-			@Body
-		</MudMainContent>
-	</MudLayout>
+    <MudLayout>
+        <MudAppBar>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            Noble Salah
+            <MudSpacer />
+            <MudMenu Icon="@_themeIcon" Color="Color.Inherit" Edge="Edge.End" AnchorOrigin="Origin.BottomRight">
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.System))">System</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.LightDefault))">Light</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.DarkDefault))">Dark</MudMenuItem>
+                <MudDivider />
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.OceanBreeze))">Ocean Breeze</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.DesertSunset))">Desert Sunset</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.NightSky))">Night Sky</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.MorningDew))">Morning Dew</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.GoldenMosque))">Golden Mosque</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.RoyalPurple))">Royal Purple</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.SerenityBlue))">Serenity Blue</MudMenuItem>
+                <MudMenuItem OnClick="@(() => SetTheme(AppTheme.ForestHarmony))">Forest Harmony</MudMenuItem>
+            </MudMenu>
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_drawerOpen">
+            <NavMenu />
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
 </MudRTLProvider>
 
 @code {
-	bool _drawerOpen = false;
-	bool _rightToLeft = false;
-	bool _isDarkMode = false;
-	string _themeIcon = Icons.Material.Filled.Brightness4;
+    bool _drawerOpen = false;
+    bool _rightToLeft = false;
+    bool _isDarkMode = false;
+    string _themeIcon = Icons.Material.Filled.Palette;
 
-	DrawerVariant _drawerVariant = DrawerVariant.Responsive;
-	MudThemeProvider? _mudThemeProvider;
-	ThemeManagerTheme _themeManager = new ThemeManagerTheme();
-	AppTheme _currentTheme = AppTheme.System;
+    DrawerVariant _drawerVariant = DrawerVariant.Responsive;
+    MudThemeProvider? _mudThemeProvider;
+    AppTheme _currentTheme = AppTheme.System;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			_isDarkMode = _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false;
-			StateHasChanged();
-		}
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SetTheme(AppTheme.System);
+            StateHasChanged();
+        }
+    }
 
-	void DrawerToggle()
-	{
-		_drawerOpen = !_drawerOpen;
-	}
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
 
-	private async Task ToggleTheme()
-	{
-		_currentTheme = _currentTheme switch
-		{
-			AppTheme.Light => AppTheme.Dark,
-			AppTheme.Dark => AppTheme.System,
-			AppTheme.System => AppTheme.Light,
-			_ => AppTheme.System
-		};
+    async Task SetTheme(AppTheme themeType)
+    {
+        _currentTheme = themeType;
+        
+        // Apply the theme using ThemeManager
+        _themeManager.ApplyTheme(themeType);
 
-		await SetTheme(_currentTheme);
-	}
+        // Set dark mode based on theme type
+        _isDarkMode = themeType switch
+        {
+            AppTheme.System => _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false,
+            AppTheme.DarkDefault => true,
+            AppTheme.OceanBreeze => true,
+            AppTheme.DesertSunset => true,
+            AppTheme.NightSky => true,
+            AppTheme.MorningDew => true,
+            AppTheme.GoldenMosque => true,
+            AppTheme.RoyalPurple => true,
+            AppTheme.SerenityBlue => true,
+            AppTheme.ForestHarmony => true,
+            _ => false
+        };
 
-	async Task SetTheme(AppTheme themeType)
-	{
-		switch (themeType)
-		{
-			case AppTheme.Light:
-				_isDarkMode = false;
-				_themeIcon = Icons.Material.Filled.Brightness7;
-				break;
-			case AppTheme.Dark:
-				_isDarkMode = true;
-				_themeIcon = Icons.Material.Filled.Brightness2;
-				break;
-			case AppTheme.System:
-				_isDarkMode = _mudThemeProvider is not null ? await _mudThemeProvider.GetSystemPreference() : false;
-				_themeIcon = Icons.Material.Filled.Brightness4;
-				break;
-		}
-	}
+        // Update theme icon based on the current theme
+        _themeIcon = themeType switch
+        {
+            AppTheme.System => Icons.Material.Filled.SettingsSuggest,
+            AppTheme.LightDefault => Icons.Material.Filled.LightMode,
+            AppTheme.DarkDefault => Icons.Material.Filled.DarkMode,
+            _ => Icons.Material.Filled.Palette
+        };
+    }
 }
